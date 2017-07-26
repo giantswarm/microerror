@@ -8,12 +8,21 @@ import (
 
 // ErrgoHandler implements Handler interface.
 type ErrgoHandler struct {
-	maskFunc func(err error, allow ...func(error) bool) error
+	callDepth int
+	maskFunc  func(err error, allow ...func(error) bool) error
 }
 
 func NewErrgoHandler() *ErrgoHandler {
+	return NewErrgoHandlerCallDepth(0)
+}
+
+// NewErrgoHandlerCallDepth is useful when creating a wrapper for ErrgoHandler.
+// The callDepth parameter is used to push stack location and skip wrapping
+// function location as an origin. The default value is 0.
+func NewErrgoHandlerCallDepth(callDepth int) *ErrgoHandler {
 	return &ErrgoHandler{
-		maskFunc: errgo.MaskFunc(errgo.Any),
+		callDepth: callDepth + 1, // +1 for ErrgoHandler wrapping methods
+		maskFunc:  errgo.MaskFunc(errgo.Any),
 	}
 }
 
@@ -22,7 +31,13 @@ func (h *ErrgoHandler) Cause(err error) error {
 }
 
 func (h *ErrgoHandler) Mask(err error) error {
-	return h.maskFunc(err)
+	if err == nil {
+		return nil
+	}
+
+	newErr := h.maskFunc(err)
+	newErr.(*errgo.Err).SetLocation(h.callDepth)
+	return newErr
 }
 
 func (h *ErrgoHandler) Maskf(err error, f string, v ...interface{}) error {
@@ -32,7 +47,6 @@ func (h *ErrgoHandler) Maskf(err error, f string, v ...interface{}) error {
 
 	f = fmt.Sprintf("%s: %s", err.Error(), f)
 	newErr := errgo.WithCausef(nil, errgo.Cause(err), f, v...)
-	newErr.(*errgo.Err).SetLocation(1)
-
+	newErr.(*errgo.Err).SetLocation(h.callDepth)
 	return newErr
 }
