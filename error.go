@@ -28,13 +28,3 @@ func Mask(err error) error {
 func Maskf(err error, f string, v ...interface{}) error {
 	return Default.Maskf(err, f, v...)
 }
-
-// MaskAny is an alias for Mask. It is there for the backward compatibility.
-func MaskAny(err error) error {
-	return Default.Mask(err)
-}
-
-// MaskAnyf is an for MaskAnyf. It is there for backward compatibility.
-func MaskAnyf(err error, f string, v ...interface{}) error {
-	return Default.Maskf(err, f, v...)
-}
