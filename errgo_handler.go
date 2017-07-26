@@ -1,8 +1,6 @@
 package microerror
 
 import (
-	"fmt"
-
 	"github.com/juju/errgo"
 )
 
@@ -45,8 +43,7 @@ func (h *ErrgoHandler) Maskf(err error, f string, v ...interface{}) error {
 		return nil
 	}
 
-	f = fmt.Sprintf("%s: %s", err.Error(), f)
-	newErr := errgo.WithCausef(nil, errgo.Cause(err), f, v...)
+	newErr := errgo.WithCausef(err, errgo.Cause(err), f, v...)
 	newErr.(*errgo.Err).SetLocation(h.callDepth)
 	return newErr
 }

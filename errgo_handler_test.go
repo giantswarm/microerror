@@ -30,44 +30,69 @@ func TestErrgoHandler_Maskf_Nil(t *testing.T) {
 	}
 }
 
-func TestErrgoHandler_Mask_Location(t *testing.T) {
-	handler := NewErrgoHandler()
-
-	err := fmt.Errorf("test")
-
-	err = handler.Mask(err)
-	err = handler.Mask(err)
-	err = handler.Mask(err)
-
-	errgoErr, ok := err.(*errgo.Err)
-	if !ok {
-		t.Fatalf("expected type *errgo.Err, got %T", err)
+func TestErrgoHandler_Stack(t *testing.T) {
+	tests := []struct {
+		desc     string
+		depth    int
+		maskFunc func(error) error
+	}{
+		{
+			desc:  "Mask (1)",
+			depth: 1,
+			maskFunc: func(err error) error {
+				h := NewErrgoHandler()
+				return h.Mask(err)
+			},
+		},
+		{
+			desc:  "Mask (3)",
+			depth: 3,
+			maskFunc: func(err error) error {
+				h := NewErrgoHandler()
+				err = h.Mask(err)
+				err = h.Mask(err)
+				err = h.Mask(err)
+				return err
+			},
+		},
+		{
+			desc:  "Maskf (3)",
+			depth: 3,
+			maskFunc: func(err error) error {
+				h := NewErrgoHandler()
+				err = h.Maskf(err, "1")
+				err = h.Maskf(err, "2")
+				err = h.Maskf(err, "3")
+				return err
+			},
+		},
 	}
 
-	file := filepath.Base(errgoErr.Location().File)
-	wfile := "errgo_handler_test.go"
-	if file != wfile {
-		t.Fatalf("expected  %s, got %s", wfile, file)
-	}
-}
+	for i, tc := range tests {
+		err := tc.maskFunc(fmt.Errorf("test"))
 
-func TestErrgoHandler_Maskf_Location(t *testing.T) {
-	handler := NewErrgoHandler()
+		var depth int
+		for {
+			// Check err location.
+			if err, ok := err.(errgo.Locationer); ok {
+				file := filepath.Base(err.Location().File)
+				wfile := "errgo_handler_test.go"
+				if file != wfile {
+					t.Errorf("#%d %s: expected  %s, got %s", i, tc.desc, wfile, file)
+				}
+			}
 
-	err := fmt.Errorf("test")
+			if cerr, ok := err.(errgo.Wrapper); ok {
+				depth++
+				err = cerr.Underlying()
+			} else {
+				break
+			}
+		}
 
-	err = handler.Maskf(err, "1")
-	err = handler.Maskf(err, "2")
-	err = handler.Maskf(err, "3")
+		if tc.depth != depth {
+			t.Fatalf("#%d %s: expected depth = %d, got %d", i, tc.desc, tc.depth, depth)
+		}
 
-	errgoErr, ok := err.(*errgo.Err)
-	if !ok {
-		t.Fatalf("expected type *errgo.Err, got %T", err)
-	}
-
-	file := filepath.Base(errgoErr.Location().File)
-	wfile := "errgo_handler_test.go"
-	if file != wfile {
-		t.Fatalf("expected  %s, got %s", wfile, file)
 	}
 }
