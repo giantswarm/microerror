@@ -4,22 +4,28 @@ import (
 	"github.com/juju/errgo"
 )
 
+type ErrgoHandlerConfig struct {
+	// CallDepth is useful when creating a wrapper for ErrgoHandler. Its
+	// value is used to push stack location and skip wrapping function
+	// location as an origin. The default value is 0.
+	CallDepth int
+}
+
+func DefaultErrgoHandlerConfig() ErrgoHandlerConfig {
+	return ErrgoHandlerConfig{
+		CallDepth: 0,
+	}
+}
+
 // ErrgoHandler implements Handler interface.
 type ErrgoHandler struct {
 	callDepth int
 	maskFunc  func(err error, allow ...func(error) bool) error
 }
 
-func NewErrgoHandler() *ErrgoHandler {
-	return NewErrgoHandlerCallDepth(0)
-}
-
-// NewErrgoHandlerCallDepth is useful when creating a wrapper for ErrgoHandler.
-// The callDepth parameter is used to push stack location and skip wrapping
-// function location as an origin. The default value is 0.
-func NewErrgoHandlerCallDepth(callDepth int) *ErrgoHandler {
+func NewErrgoHandler(config ErrgoHandlerConfig) *ErrgoHandler {
 	return &ErrgoHandler{
-		callDepth: callDepth + 1, // +1 for ErrgoHandler wrapping methods
+		callDepth: config.CallDepth + 1, // +1 for ErrgoHandler wrapping methods
 		maskFunc:  errgo.MaskFunc(errgo.Any),
 	}
 }

@@ -11,11 +11,11 @@ import (
 func TestErrgoHandler_Interface(t *testing.T) {
 	// This will not complie if ErrgoHandler does not fulfill Handler
 	// interface.
-	var _ Handler = NewErrgoHandler()
+	var _ Handler = NewErrgoHandler(DefaultErrgoHandlerConfig())
 }
 
 func TestErrgoHandler_Mask_Nil(t *testing.T) {
-	handler := NewErrgoHandler()
+	handler := NewErrgoHandler(DefaultErrgoHandlerConfig())
 	err := handler.Mask(nil)
 	if err != nil {
 		t.Fatalf("expected nil, got %v", err)
@@ -23,7 +23,7 @@ func TestErrgoHandler_Mask_Nil(t *testing.T) {
 }
 
 func TestErrgoHandler_Maskf_Nil(t *testing.T) {
-	handler := NewErrgoHandler()
+	handler := NewErrgoHandler(DefaultErrgoHandlerConfig())
 	err := handler.Maskf(nil, "test annotation")
 	if err != nil {
 		t.Fatalf("expected nil, got %v", err)
@@ -40,7 +40,7 @@ func TestErrgoHandler_Stack(t *testing.T) {
 			desc:  "Mask (1)",
 			depth: 1,
 			maskFunc: func(err error) error {
-				h := NewErrgoHandler()
+				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
 				return h.Mask(err)
 			},
 		},
@@ -48,7 +48,7 @@ func TestErrgoHandler_Stack(t *testing.T) {
 			desc:  "Mask (3)",
 			depth: 3,
 			maskFunc: func(err error) error {
-				h := NewErrgoHandler()
+				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
 				err = h.Mask(err)
 				err = h.Mask(err)
 				err = h.Mask(err)
@@ -59,7 +59,7 @@ func TestErrgoHandler_Stack(t *testing.T) {
 			desc:  "Maskf (3)",
 			depth: 3,
 			maskFunc: func(err error) error {
-				h := NewErrgoHandler()
+				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
 				err = h.Maskf(err, "1")
 				err = h.Maskf(err, "2")
 				err = h.Maskf(err, "3")

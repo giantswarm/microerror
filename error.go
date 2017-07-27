@@ -3,7 +3,9 @@
 package microerror
 
 var (
-	Default = NewErrgoHandlerCallDepth(1)
+	Default = NewErrgoHandler(ErrgoHandlerConfig{
+		CallDepth: 1,
+	})
 )
 
 // Cause returns the cause of the given error. If the cause of the err can not
