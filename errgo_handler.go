@@ -30,6 +30,14 @@ func NewErrgoHandler(config ErrgoHandlerConfig) *ErrgoHandler {
 	}
 }
 
+func (h *ErrgoHandler) New(s string) error {
+	return errgo.New(s)
+}
+
+func (h *ErrgoHandler) Newf(f string, v ...interface{}) error {
+	return errgo.Newf(f, v...)
+}
+
 func (h *ErrgoHandler) Cause(err error) error {
 	return errgo.Cause(err)
 }

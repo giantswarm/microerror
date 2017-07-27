@@ -8,6 +8,17 @@ var (
 	})
 )
 
+// New returns a new error with the given error message. It is a drop-in
+// replacement for errors.New from the standard library.
+func New(s string) error {
+	return Default.New(s)
+}
+
+// Newf returns a new error with the given printf-formatted error message.
+func Newf(f string, v ...interface{}) error {
+	return Default.Newf(f, v...)
+}
+
 // Cause returns the cause of the given error. If the cause of the err can not
 // be found it returns the err itself.
 //

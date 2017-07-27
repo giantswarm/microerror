@@ -1,6 +1,14 @@
 package microerror
 
 type Handler interface {
+	// New returns a new error with the given error message. It is
+	// a drop-in replacement for errors.New from the standard library.
+	New(s string) error
+
+	// Newf returns a new error with the given printf-formatted error
+	// message.
+	Newf(f string, v ...interface{}) error
+
 	// Cause returns the cause of the given error. If the cause of the err can not
 	// be found it returns the err itself.
 	//
@@ -15,6 +23,6 @@ type Handler interface {
 
 	// Maskf is like Mask. In addition to that it takes a format string and
 	// variadic arguments like fmt.Sprintf. The format string and variadic
-	// arguments are used to annotate the given errgo error.
+	// arguments are used to annotate the given error.
 	Maskf(err error, f string, v ...interface{}) error
 }
