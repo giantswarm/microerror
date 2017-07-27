@@ -3,7 +3,7 @@
 package microerror
 
 var (
-	Default Handler = NewErrgoHandler(ErrgoHandlerConfig{
+	handler Handler = NewErrgoHandler(ErrgoHandlerConfig{
 		CallDepth: 1,
 	})
 )
@@ -11,12 +11,12 @@ var (
 // New returns a new error with the given error message. It is a drop-in
 // replacement for errors.New from the standard library.
 func New(s string) error {
-	return Default.New(s)
+	return handler.New(s)
 }
 
 // Newf returns a new error with the given printf-formatted error message.
 func Newf(f string, v ...interface{}) error {
-	return Default.Newf(f, v...)
+	return handler.Newf(f, v...)
 }
 
 // Cause returns the cause of the given error. If the cause of the err can not
@@ -25,19 +25,19 @@ func Newf(f string, v ...interface{}) error {
 // Cause is the usual way to diagnose errors that may have been wrapped by Mask
 // or Maskf.
 func Cause(err error) error {
-	return Default.Cause(err)
+	return handler.Cause(err)
 }
 
 // Mask is a simple error masker. Masked errors act as tracers within the
 // source code. Inspecting an masked error shows where the error was passed
 // through within the code base. This is gold for debugging and bug hunting.
 func Mask(err error) error {
-	return Default.Mask(err)
+	return handler.Mask(err)
 }
 
 // Maskf is like Mask. In addition to that it takes a format string and
 // variadic arguments like fmt.Sprintf. The format string and variadic
 // arguments are used to annotate the given errgo error.
 func Maskf(err error, f string, v ...interface{}) error {
-	return Default.Maskf(err, f, v...)
+	return handler.Maskf(err, f, v...)
 }
