@@ -34,21 +34,60 @@ func TestErrgoHandler_Stack(t *testing.T) {
 	tests := []struct {
 		desc     string
 		depth    int
-		maskFunc func(error) error
+		newError func() error
 	}{
 		{
-			desc:  "Mask (1)",
+			desc:  "Mask depth=1 constructor=handler.New",
 			depth: 1,
-			maskFunc: func(err error) error {
+			newError: func() error {
 				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
-				return h.Mask(err)
+
+				err := h.New("test")
+				return err
 			},
 		},
 		{
-			desc:  "Mask (3)",
-			depth: 3,
-			maskFunc: func(err error) error {
+			desc:  "Mask depth=2 constructor=handler.New",
+			depth: 2,
+			newError: func() error {
 				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
+
+				err := h.New("test")
+				err = h.Mask(err)
+				return err
+			},
+		},
+		{
+			desc:  "Mask/Maskf depth=3 constructor=handler.Newf",
+			depth: 3,
+			newError: func() error {
+				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
+
+				err := h.Newf("%s", "test")
+				err = h.Mask(err)
+				err = h.Maskf(err, "3")
+				return err
+
+			},
+		},
+		{
+			desc:  "Mask depth=1 constructor=fmt.Errorf",
+			depth: 1,
+			newError: func() error {
+				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
+
+				err := fmt.Errorf("test")
+				err = h.Mask(err)
+				return err
+			},
+		},
+		{
+			desc:  "Mask depth=3 constructor=fmt.Errorf",
+			depth: 3,
+			newError: func() error {
+				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
+
+				err := fmt.Errorf("test")
 				err = h.Mask(err)
 				err = h.Mask(err)
 				err = h.Mask(err)
@@ -56,10 +95,12 @@ func TestErrgoHandler_Stack(t *testing.T) {
 			},
 		},
 		{
-			desc:  "Maskf (3)",
+			desc:  "Maskf depth=3 constructor=fmt.Errorf",
 			depth: 3,
-			maskFunc: func(err error) error {
+			newError: func() error {
 				h := NewErrgoHandler(DefaultErrgoHandlerConfig())
+
+				err := fmt.Errorf("test")
 				err = h.Maskf(err, "1")
 				err = h.Maskf(err, "2")
 				err = h.Maskf(err, "3")
@@ -69,7 +110,7 @@ func TestErrgoHandler_Stack(t *testing.T) {
 	}
 
 	for i, tc := range tests {
-		err := tc.maskFunc(fmt.Errorf("test"))
+		err := tc.newError()
 
 		var depth int
 		for {

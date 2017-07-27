@@ -31,11 +31,15 @@ func NewErrgoHandler(config ErrgoHandlerConfig) *ErrgoHandler {
 }
 
 func (h *ErrgoHandler) New(s string) error {
-	return errgo.New(s)
+	err := errgo.New(s).(*errgo.Err)
+	err.SetLocation(h.callDepth)
+	return err
 }
 
 func (h *ErrgoHandler) Newf(f string, v ...interface{}) error {
-	return errgo.Newf(f, v...)
+	err := errgo.Newf(f, v...).(*errgo.Err)
+	err.SetLocation(h.callDepth)
+	return err
 }
 
 func (h *ErrgoHandler) Cause(err error) error {

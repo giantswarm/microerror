@@ -26,19 +26,50 @@ func TestStack(t *testing.T) {
 	tests := []struct {
 		desc     string
 		depth    int
-		maskFunc func(error) error
+		newError func() error
 	}{
 		{
-			desc:  "Mask (1)",
+			desc:  "Mask depth=1 constructor=New",
 			depth: 1,
-			maskFunc: func(err error) error {
-				return Mask(err)
+			newError: func() error {
+				err := New("test")
+				return err
 			},
 		},
 		{
-			desc:  "Mask (3)",
+			desc:  "Mask depth=2 constructor=New",
+			depth: 2,
+			newError: func() error {
+				err := New("test")
+				err = Mask(err)
+				return err
+			},
+		},
+		{
+			desc:  "Mask/Maskf depth=3 constructor=Newf",
 			depth: 3,
-			maskFunc: func(err error) error {
+			newError: func() error {
+				err := Newf("%s", "test")
+				err = Mask(err)
+				err = Maskf(err, "3")
+				return err
+
+			},
+		},
+		{
+			desc:  "Mask depth=1 constructor=fmt.Errorf",
+			depth: 1,
+			newError: func() error {
+				err := fmt.Errorf("test")
+				err = Mask(err)
+				return err
+			},
+		},
+		{
+			desc:  "Mask depth=3 constructor=fmt.Errorf",
+			depth: 3,
+			newError: func() error {
+				err := fmt.Errorf("test")
 				err = Mask(err)
 				err = Mask(err)
 				err = Mask(err)
@@ -46,9 +77,10 @@ func TestStack(t *testing.T) {
 			},
 		},
 		{
-			desc:  "Maskf (3)",
+			desc:  "Maskf depth=3 constructor=fmt.Errorf",
 			depth: 3,
-			maskFunc: func(err error) error {
+			newError: func() error {
+				err := fmt.Errorf("test")
 				err = Maskf(err, "1")
 				err = Maskf(err, "2")
 				err = Maskf(err, "3")
@@ -58,7 +90,7 @@ func TestStack(t *testing.T) {
 	}
 
 	for i, tc := range tests {
-		err := tc.maskFunc(fmt.Errorf("test"))
+		err := tc.newError()
 
 		var depth int
 		for {
