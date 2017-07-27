@@ -3,20 +3,22 @@
 package microerror
 
 var (
-	Default Handler = NewErrgoHandler(ErrgoHandlerConfig{
-		CallDepth: 1,
-	})
+	Default Handler = NewErrgoHandler(DefaultErrgoHandlerConfig())
 )
 
 // New returns a new error with the given error message. It is a drop-in
 // replacement for errors.New from the standard library.
 func New(s string) error {
-	return Default.New(s)
+	err := Default.New(s)
+	err = hackErrgoCallDepth(err)
+	return err
 }
 
 // Newf returns a new error with the given printf-formatted error message.
 func Newf(f string, v ...interface{}) error {
-	return Default.Newf(f, v...)
+	err := Default.Newf(f, v...)
+	err = hackErrgoCallDepth(err)
+	return err
 }
 
 // Cause returns the cause of the given error. If the cause of the err can not
@@ -32,12 +34,31 @@ func Cause(err error) error {
 // source code. Inspecting an masked error shows where the error was passed
 // through within the code base. This is gold for debugging and bug hunting.
 func Mask(err error) error {
-	return Default.Mask(err)
+	err = Default.Mask(err)
+	err = hackErrgoCallDepth(err)
+	return err
 }
 
 // Maskf is like Mask. In addition to that it takes a format string and
 // variadic arguments like fmt.Sprintf. The format string and variadic
 // arguments are used to annotate the given errgo error.
 func Maskf(err error, f string, v ...interface{}) error {
-	return Default.Maskf(err, f, v...)
+	err = Default.Maskf(err, f, v...)
+	err = hackErrgoCallDepth(err)
+	return err
+}
+
+type locationer interface {
+	SetLocation(int)
+}
+
+func hackErrgoCallDepth(err error) error {
+	if err == nil {
+		return nil
+	}
+	_, ok := Default.(*ErrgoHandler)
+	if ok {
+		err.(locationer).SetLocation(2)
+	}
+	return err
 }
