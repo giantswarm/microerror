@@ -97,7 +97,7 @@ func TestStack(t *testing.T) {
 			// Check err location.
 			if err, ok := err.(errgo.Locationer); ok {
 				file := filepath.Base(err.Location().File)
-				wfile := "error_test.go"
+				wfile := "microerror_test.go"
 				if file != wfile {
 					t.Errorf("#%d %s: expected  %s, got %s", i, tc.desc, wfile, file)
 				}
