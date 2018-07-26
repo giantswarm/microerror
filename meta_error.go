@@ -1,6 +1,10 @@
 package microerror
 
-import "github.com/juju/errgo"
+import (
+	"encoding/json"
+
+	"github.com/juju/errgo"
+)
 
 type metaError struct {
 	cause    error
@@ -59,6 +63,27 @@ func NewMetaError(err error, meta map[string]string) error {
 
 func (m *metaError) Error() string {
 	return m.cause.Error()
+}
+
+func (m *metaError) MarshalJSON() ([]byte, error) {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil, Mask(err)
+	}
+
+	return b, nil
+}
+
+func (m *metaError) UnmarshalJSON(b []byte) error {
+	var c metaError
+	err := json.Unmarshal(b, &c)
+	if err != nil {
+		return Mask(err)
+	}
+
+	*m = c
+
+	return nil
 }
 
 func FromMetaError(err error, key string) (string, error) {
