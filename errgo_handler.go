@@ -1,6 +1,7 @@
 package microerror
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/juju/errgo"
@@ -33,7 +34,7 @@ func NewErrgoHandler(config ErrgoHandlerConfig) *ErrgoHandler {
 }
 
 func (h *ErrgoHandler) New(s string) error {
-	return NewMetaError(s)
+	return errors.New(s)
 }
 
 func (h *ErrgoHandler) Newf(f string, v ...interface{}) error {
@@ -41,7 +42,7 @@ func (h *ErrgoHandler) Newf(f string, v ...interface{}) error {
 }
 
 func (h *ErrgoHandler) Cause(err error) error {
-	return errgo.Cause(err)
+	return metaErrorCause(errgo.Cause(err))
 }
 
 func (h *ErrgoHandler) Mask(err error) error {
