@@ -42,7 +42,7 @@ func (h *ErrgoHandler) Newf(f string, v ...interface{}) error {
 }
 
 func (h *ErrgoHandler) Cause(err error) error {
-	return metaErrorCause(errgo.Cause(err))
+	return errgo.Cause(err)
 }
 
 func (h *ErrgoHandler) Mask(err error) error {
