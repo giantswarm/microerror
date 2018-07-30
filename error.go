@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-// Error is a predefined error structure which purpose is to act as container
+// Error is a predefined error structure whose purpose is to act as container
 // for meta information associated to a specific error. The specific error type
 // matching can be used as usual. The usual error masking and cause gathering
 // can be used as usual. Using Error might look as follows. In the beginning is
