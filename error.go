@@ -28,7 +28,7 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
-	return toStringCase(e.Kind)
+	return e.Desc
 }
 
 func (e *Error) GoString() string {
