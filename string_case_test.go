@@ -40,6 +40,41 @@ func Test_toStringCase(t *testing.T) {
 			InputString:    "AuthenticationError",
 			ExpectedString: "authentication error",
 		},
+		{
+			Name:           "case 6: camel case with abbreviation at the start",
+			InputString:    "APINotAvailableError",
+			ExpectedString: "api not available error",
+		},
+		{
+			Name:           "case 7: camel case with abbreviation in the middle",
+			InputString:    "invalidHTTPStatusError",
+			ExpectedString: "invalid http status error",
+		},
+		{
+			Name:           "case 8: camel case with abbreviation at the end",
+			InputString:    "fooBarBAZ",
+			ExpectedString: "foo bar baz",
+		},
+		{
+			Name:           "case 9: with version numbers at the start",
+			InputString:    "v2RouteNotReachable",
+			ExpectedString: "v2 route not reachable",
+		},
+		{
+			Name:           "case 10: with version numbers in the middle",
+			InputString:    "oldV2RouteNotReachable",
+			ExpectedString: "old v2 route not reachable",
+		},
+		{
+			Name:           "case 11: with version numbers in the middle",
+			InputString:    "oldV2RouteNotReachable",
+			ExpectedString: "old v2 route not reachable",
+		},
+		{
+			Name:           "case 12: with version numbers at the end does not work",
+			InputString:    "statusCode200",
+			ExpectedString: "status code200",
+		},
 	}
 
 	for _, tc := range testCases {
