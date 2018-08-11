@@ -20,9 +20,16 @@ import "encoding/json"
 //     }
 //
 type Error struct {
-	Desc string `json:"desc"`
-	Docs string `json:"docs"`
-	Kind string `json:"kind"`
+	Desc  string  `json:"desc"`
+	Docs  string  `json:"docs"`
+	Kind  string  `json:"kind"`
+	Stack []Stack `json:"stack"`
+}
+
+type Stack struct {
+	File    string `json:"file"`
+	Line    int    `json:"line"`
+	Message string `json:"message"`
 }
 
 func (e *Error) Error() string {
