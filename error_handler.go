@@ -50,10 +50,11 @@ func (h *ErrorHandler) Mask(err error) error {
 		return nil
 	}
 
-	e, ok := err.(*Error)
-	if !ok {
-		e = newDefaultError()
-		e.Cause = h.Cause(err)
+	e := newDefaultError()
+	e.Cause = h.Cause(err)
+	w, ok := err.(*Error)
+	if ok {
+		e.Stack = append(e.Stack, w.Stack...)
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
@@ -73,10 +74,11 @@ func (h *ErrorHandler) Maskf(err error, format string, args ...interface{}) erro
 		return nil
 	}
 
-	e, ok := err.(*Error)
-	if !ok {
-		e = newDefaultError()
-		e.Cause = h.Cause(err)
+	e := newDefaultError()
+	e.Cause = h.Cause(err)
+	w, ok := err.(*Error)
+	if ok {
+		e.Stack = append(e.Stack, w.Stack...)
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
