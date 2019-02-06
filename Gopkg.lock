@@ -3,13 +3,15 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:6a3c12156fd310ad95e3fe38070b1bf74e123552e374f1a57a188682a96d168e"
   name = "github.com/juju/errgo"
   packages = ["."]
+  pruneopts = ""
   revision = "08cceb5d0b5331634b9826762a8fd53b29b86ad8"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "171f0da09cd4bd5d59ebf41a2183b59e442b637cf0046604ad7dc945fe9385c3"
+  input-imports = ["github.com/juju/errgo"]
   solver-name = "gps-cdcl"
   solver-version = 1
