@@ -49,12 +49,7 @@ func (h *ErrorHandler) Mask(err error) error {
 
 	e, ok := c.(*Error)
 	if !ok {
-		e = &Error{
-			Desc:  "",
-			Docs:  "",
-			Kind:  "ThirdPartyError",
-			Stack: nil,
-		}
+		e = newDefaultError()
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
@@ -82,19 +77,14 @@ func (h *ErrorHandler) Maskf(err error, format string, args ...interface{}) erro
 
 	e, ok := c.(*Error)
 	if !ok {
-		e = &Error{
-			Desc:  "",
-			Docs:  "",
-			Kind:  "ThirdPartyError",
-			Stack: nil,
-		}
+		e = newDefaultError()
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
 	s := Stack{
 		File:    f,
 		Line:    l,
-		Message: fmt.Sprintf(format, args),
+		Message: fmt.Sprintf(format, args...),
 	}
 
 	e.Stack = append(e.Stack, s)

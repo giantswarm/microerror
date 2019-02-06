@@ -125,22 +125,30 @@ func Test_ErrorHandler_Cause(t *testing.T) {
 				c := ErrorHandlerConfig{}
 				h := NewErrorHandler(c)
 
-				err := &Error{
-					Kind: "",
+				e := &Error{
+					Kind: "testError",
 				}
 
+				err := h.Mask(e)
 				err = h.Mask(err)
+				err = h.Maskf(err, "annotation")
 
 				return err
 			},
 			ExpectedFiles: []string{
 				"error_handler_test.go",
+				"error_handler_test.go",
+				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				50,
+				132,
+				133,
+				134,
 			},
 			ExpectedMessages: []string{
 				"test error",
+				"",
+				"annotation",
 			},
 		},
 		{
@@ -161,8 +169,8 @@ func Test_ErrorHandler_Cause(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				72,
-				73,
+				162,
+				163,
 			},
 			ExpectedMessages: []string{
 				"test error",
@@ -191,9 +199,9 @@ func Test_ErrorHandler_Cause(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				98,
-				99,
-				102,
+				188,
+				189,
+				192,
 			},
 			ExpectedMessages: []string{
 				"test error",
@@ -206,8 +214,6 @@ func Test_ErrorHandler_Cause(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			err := tc.ErrorFunc()
-
-			fmt.Printf("%#v\n", err)
 
 			e, ok := err.(*Error)
 			if !ok {
@@ -238,6 +244,58 @@ func Test_ErrorHandler_Cause(t *testing.T) {
 				if e.Stack[i].Message != tc.ExpectedMessages[i] {
 					t.Fatalf("expected %s got %s", tc.ExpectedMessages[i], e.Stack[i].Message)
 				}
+			}
+		})
+	}
+}
+
+func Test_ErrorHandler_Error(t *testing.T) {
+	testCases := []struct {
+		Name            string
+		ErrorFunc       func() string
+		ExpectedMessage string
+	}{
+		{
+			Name: "Case 0",
+			ErrorFunc: func() string {
+				c := ErrorHandlerConfig{}
+				h := NewErrorHandler(c)
+
+				e := fmt.Errorf("test error")
+
+				err := h.Mask(e)
+				err = h.Maskf(err, "annotation")
+
+				return err.Error()
+			},
+			ExpectedMessage: "test error",
+		},
+		{
+			Name: "Case 1",
+			ErrorFunc: func() string {
+				c := ErrorHandlerConfig{}
+				h := NewErrorHandler(c)
+
+				e := &Error{
+					Kind: "testError",
+				}
+
+				err := h.Mask(e)
+				err = h.Mask(e)
+				err = h.Maskf(e, "annotation")
+
+				return err.Error()
+			},
+			ExpectedMessage: "test error",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			message := tc.ErrorFunc()
+
+			if message != tc.ExpectedMessage {
+				t.Fatalf("expected %s got %s", tc.ExpectedMessage, message)
 			}
 		})
 	}

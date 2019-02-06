@@ -20,19 +20,26 @@ import "encoding/json"
 //     }
 //
 type Error struct {
-	Desc  string  `json:"desc"`
-	Docs  string  `json:"docs"`
-	Kind  string  `json:"kind"`
-	Stack []Stack `json:"stack"`
+	Desc  string  `json:"desc,omitempty"`
+	Docs  string  `json:"docs,omitempty"`
+	Kind  string  `json:"kind,omitempty"`
+	Stack []Stack `json:"stack,omitempty"`
 }
 
 type Stack struct {
-	File    string `json:"file"`
-	Line    int    `json:"line"`
-	Message string `json:"message"`
+	File    string `json:"file,omitempty"`
+	Line    int    `json:"line,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 func (e *Error) Error() string {
+	if len(e.Stack) > 0 {
+		m := e.Stack[0].Message
+		if m != "" {
+			return m
+		}
+	}
+
 	return toStringCase(e.Kind)
 }
 
@@ -47,4 +54,13 @@ func (e *Error) String() string {
 	}
 
 	return string(b)
+}
+
+func newDefaultError() *Error {
+	return &Error{
+		Desc:  "This is the default microerror error. It wraps an arbitrary third party error. See more information in the transported stack.",
+		Docs:  "https://github.com/giantswarm/microerror",
+		Kind:  "defaultMicroError",
+		Stack: nil,
+	}
 }

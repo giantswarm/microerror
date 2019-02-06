@@ -134,6 +134,5 @@ func TestErrgoHandler_Stack(t *testing.T) {
 		if tc.depth != depth {
 			t.Fatalf("#%d %s: expected depth = %d, got %d", i, tc.desc, tc.depth, depth)
 		}
-
 	}
 }
