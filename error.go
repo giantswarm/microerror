@@ -20,6 +20,7 @@ import "encoding/json"
 //     }
 //
 type Error struct {
+	Cause error   `json:"cause,omitempty"`
 	Desc  string  `json:"desc,omitempty"`
 	Docs  string  `json:"docs,omitempty"`
 	Kind  string  `json:"kind,omitempty"`
@@ -33,11 +34,8 @@ type Stack struct {
 }
 
 func (e *Error) Error() string {
-	if len(e.Stack) > 0 {
-		m := e.Stack[0].Message
-		if m != "" {
-			return m
-		}
+	if e.Cause != nil {
+		return e.Cause.Error()
 	}
 
 	return toStringCase(e.Kind)
@@ -48,6 +46,17 @@ func (e *Error) GoString() string {
 }
 
 func (e *Error) String() string {
+	// When the current cause is not of type *Error, we want to ensure the
+	// transported cause is marshaled properly. Arbitrary error types are stupid
+	// interfaces and marshal to nil otherwise. Here we lose all kinds of custom
+	// information of all kinds of error implementations out there. We try to
+	// preserve the error message though.
+	if e.Cause != nil {
+		e.Cause = &MarshalableError{
+			Message: e.Cause.Error(),
+		}
+	}
+
 	b, err := json.Marshal(e)
 	if err != nil {
 		panic(err)
@@ -58,7 +67,8 @@ func (e *Error) String() string {
 
 func newDefaultError() *Error {
 	return &Error{
-		Desc:  "This is the default microerror error. It wraps an arbitrary third party error. See more information in the transported stack.",
+		Cause: nil,
+		Desc:  "This is the default microerror error. It wraps an arbitrary third party error. See more information in the transported cause and stack.",
 		Docs:  "https://github.com/giantswarm/microerror",
 		Kind:  "defaultMicroError",
 		Stack: nil,

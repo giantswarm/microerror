@@ -3,7 +3,7 @@
 package microerror
 
 var (
-	handler Handler = NewErrgoHandler(ErrgoHandlerConfig{
+	handler Handler = NewErrorHandler(ErrorHandlerConfig{
 		CallDepth: 1,
 	})
 )

@@ -1,6 +1,7 @@
 package microerror
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 )
@@ -24,17 +25,21 @@ func NewErrorHandler(config ErrorHandlerConfig) *ErrorHandler {
 }
 
 func (h *ErrorHandler) New(s string) error {
-	return nil
+	return errors.New(s)
 }
 
 func (h *ErrorHandler) Newf(f string, v ...interface{}) error {
-	return nil
+	return fmt.Errorf(f, v...)
 }
 
 func (h *ErrorHandler) Cause(err error) error {
 	e, ok := err.(*Error)
 	if !ok {
 		return err
+	}
+
+	if e.Cause != nil {
+		return e.Cause
 	}
 
 	return e
@@ -45,11 +50,10 @@ func (h *ErrorHandler) Mask(err error) error {
 		return nil
 	}
 
-	c := h.Cause(err)
-
-	e, ok := c.(*Error)
+	e, ok := err.(*Error)
 	if !ok {
 		e = newDefaultError()
+		e.Cause = h.Cause(err)
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
@@ -57,10 +61,6 @@ func (h *ErrorHandler) Mask(err error) error {
 		File:    f,
 		Line:    l,
 		Message: "",
-	}
-
-	if len(e.Stack) == 0 {
-		s.Message = c.Error()
 	}
 
 	e.Stack = append(e.Stack, s)
@@ -73,11 +73,10 @@ func (h *ErrorHandler) Maskf(err error, format string, args ...interface{}) erro
 		return nil
 	}
 
-	c := h.Cause(err)
-
-	e, ok := c.(*Error)
+	e, ok := err.(*Error)
 	if !ok {
 		e = newDefaultError()
+		e.Cause = h.Cause(err)
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)

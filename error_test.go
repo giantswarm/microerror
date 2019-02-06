@@ -2,25 +2,46 @@ package microerror
 
 import (
 	"fmt"
-	"regexp"
+	"strings"
 	"testing"
 )
 
-func Test_Error(t *testing.T) {
-	var err error
+func Test_Error_String_1(t *testing.T) {
+	c := ErrorHandlerConfig{}
+	h := NewErrorHandler(c)
 
-	testError := &Error{
+	e := fmt.Errorf("test error")
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+	err = h.Maskf(err, "annotation")
+	err = h.Mask(err)
+	s := err.(*Error).String()
+
+	prefix := `{"cause":{"message":"test error"},"desc":"This is the`
+
+	if !strings.HasPrefix(s, prefix) {
+		t.Fatalf("expected %s to have prefix %s", s, prefix)
+	}
+}
+
+func Test_Error_String_2(t *testing.T) {
+	c := ErrorHandlerConfig{}
+	h := NewErrorHandler(c)
+
+	e := &Error{
 		Kind: "testError",
 	}
 
-	err = Mask(testError)
+	err := h.Mask(e)
+	err = h.Mask(err)
+	err = h.Maskf(err, "annotation")
+	err = h.Mask(err)
+	s := err.(*Error).String()
 
-	got := fmt.Sprintf("%#v\n", err)
-	r, err := regexp.Compile(`[.* test error]`)
-	if err != nil {
-		t.Fatalf("expected %#v got %#v", nil, err)
-	}
-	if !r.MatchString(got) {
-		t.Fatalf("expected %#v got %#v", true, false)
+	prefix := `{"kind":"testError","stack":[{"file":`
+
+	if !strings.HasPrefix(s, prefix) {
+		t.Fatalf("expected %s to have prefix %s", s, prefix)
 	}
 }
