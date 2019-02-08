@@ -73,9 +73,8 @@ func (h *ErrorHandler) Mask(err error) error {
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
 	s := Stack{
-		File:    f,
-		Line:    l,
-		Message: "",
+		File: f,
+		Line: l,
 	}
 
 	e.Stack = append(e.Stack, s)

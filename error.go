@@ -32,9 +32,8 @@ type Error struct {
 }
 
 type Stack struct {
-	File    string `json:"file,omitempty"`
-	Line    int    `json:"line,omitempty"`
-	Message string `json:"message,omitempty"`
+	File string `json:"file,omitempty"`
+	Line int    `json:"line,omitempty"`
 }
 
 func (e *Error) Error() string {
