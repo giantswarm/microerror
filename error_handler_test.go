@@ -6,63 +6,6 @@ import (
 	"testing"
 )
 
-func Test_ErrorHandler_Interface(t *testing.T) {
-	// This will not complie if ErrorHandler does not fulfill Handler
-	// interface.
-	c := ErrorHandlerConfig{}
-	var _ Handler = NewErrorHandler(c)
-}
-
-func Test_ErrorHandler_Mask_Nil(t *testing.T) {
-	c := ErrorHandlerConfig{}
-	handler := NewErrorHandler(c)
-	err := handler.Mask(nil)
-	if err != nil {
-		t.Fatalf("expected nil, got %v", err)
-	}
-}
-
-func Test_ErrorHandler_Maskf_Nil(t *testing.T) {
-	c := ErrorHandlerConfig{}
-	handler := NewErrorHandler(c)
-	err := handler.Maskf(nil, "test annotation")
-	if err != nil {
-		t.Fatalf("expected nil, got %v", err)
-	}
-}
-
-func Test_ErrorHandler_Cause_1(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := fmt.Errorf("test error")
-
-	err := h.Mask(e)
-	err = h.Maskf(err, "annotation")
-
-	c := h.Cause(err)
-
-	if c != e {
-		t.Fatalf("expected %T to equal %T", c, e)
-	}
-}
-
-func Test_ErrorHandler_Cause_2(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := &Error{
-		Kind: "testError",
-	}
-
-	err := h.Mask(e)
-	err = h.Maskf(err, "annotation")
-
-	c := h.Cause(err)
-
-	if c != e {
-		t.Fatalf("expected %T to equal %T", c, e)
-	}
-}
-
 func Test_ErrorHandler_Error(t *testing.T) {
 	testCases := []struct {
 		Name            string
@@ -78,7 +21,7 @@ func Test_ErrorHandler_Error(t *testing.T) {
 				e := fmt.Errorf("test error")
 
 				err := h.Mask(e)
-				err = h.Maskf(err, "annotation")
+				err = h.Mask(err)
 
 				return err.Error()
 			},
@@ -96,7 +39,7 @@ func Test_ErrorHandler_Error(t *testing.T) {
 
 				err := h.Mask(e)
 				err = h.Mask(e)
-				err = h.Maskf(e, "annotation")
+				err = h.Mask(err)
 
 				return err.Error()
 			},
@@ -137,11 +80,10 @@ func Test_ErrorHandler_Error(t *testing.T) {
 
 func Test_ErrorHandler_Stack(t *testing.T) {
 	testCases := []struct {
-		Name             string
-		ErrorFunc        func() error
-		ExpectedFiles    []string
-		ExpectedLines    []int
-		ExpectedMessages []string
+		Name          string
+		ErrorFunc     func() error
+		ExpectedFiles []string
+		ExpectedLines []int
 	}{
 		{
 			Name: "Case 0",
@@ -159,10 +101,7 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				154,
-			},
-			ExpectedMessages: []string{
-				"",
+				96,
 			},
 		},
 		{
@@ -183,12 +122,8 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				176,
-				177,
-			},
-			ExpectedMessages: []string{
-				"",
-				"",
+				115,
+				116,
 			},
 		},
 		{
@@ -213,14 +148,9 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				202,
-				203,
-				206,
-			},
-			ExpectedMessages: []string{
-				"",
-				"",
-				"",
+				137,
+				138,
+				141,
 			},
 		},
 		{
@@ -235,7 +165,7 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 
 				err := h.Mask(e)
 				err = h.Mask(err)
-				err = h.Maskf(err, "annotation")
+				err = h.Mask(err)
 
 				return err
 			},
@@ -245,14 +175,9 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				236,
-				237,
-				238,
-			},
-			ExpectedMessages: []string{
-				"",
-				"",
-				"annotation",
+				166,
+				167,
+				168,
 			},
 		},
 		{
@@ -273,12 +198,8 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				266,
-				267,
-			},
-			ExpectedMessages: []string{
-				"",
-				"",
+				191,
+				192,
 			},
 		},
 		{
@@ -303,14 +224,9 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				292,
-				293,
-				296,
-			},
-			ExpectedMessages: []string{
-				"",
-				"",
-				"",
+				213,
+				214,
+				217,
 			},
 		},
 	}
@@ -330,9 +246,6 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 			if len(e.Stack) != len(tc.ExpectedFiles) {
 				t.Fatalf("expected %d got %d", len(tc.ExpectedFiles), len(e.Stack))
 			}
-			if len(e.Stack) != len(tc.ExpectedMessages) {
-				t.Fatalf("expected %d got %d", len(tc.ExpectedMessages), len(e.Stack))
-			}
 
 			for i, _ := range e.Stack {
 				if filepath.Base(e.Stack[i].File) != tc.ExpectedFiles[i] {
@@ -344,11 +257,119 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 					t.Fatalf("expected %d got %d", tc.ExpectedLines[i], e.Stack[i].Line)
 				}
 			}
-			for i, _ := range e.Stack {
-				if e.Stack[i].Message != tc.ExpectedMessages[i] {
-					t.Fatalf("expected %s got %s", tc.ExpectedMessages[i], e.Stack[i].Message)
-				}
-			}
 		})
+	}
+}
+func Test_ErrorHandler_Interface(t *testing.T) {
+	// This will not complie if ErrorHandler does not fulfill Handler
+	// interface.
+	c := ErrorHandlerConfig{}
+	var _ Handler = NewErrorHandler(c)
+}
+
+func Test_ErrorHandler_Mask_Nil(t *testing.T) {
+	c := ErrorHandlerConfig{}
+	handler := NewErrorHandler(c)
+	err := handler.Mask(nil)
+	if err != nil {
+		t.Fatalf("expected nil, got %v", err)
+	}
+}
+
+func Test_ErrorHandler_Cause_1(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := fmt.Errorf("test error")
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	c := h.Cause(err)
+
+	if c != e {
+		t.Fatalf("expected %T to equal %T", c, e)
+	}
+}
+
+func Test_ErrorHandler_Cause_2(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := &Error{
+		Kind: "testError",
+	}
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	c := h.Cause(err)
+
+	if c != e {
+		t.Fatalf("expected %T to equal %T", c, e)
+	}
+}
+
+func Test_ErrorHandler_Desc_1(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := fmt.Errorf("test error")
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	d := err.(*Error).Desc
+	s := "This is the default microerror error. It wraps an arbitrary third party error. See more information in the transported cause and stack."
+	if d != s {
+		t.Fatalf("expected %s to equal %s", d, s)
+	}
+}
+
+func Test_ErrorHandler_Desc_2(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := &Error{
+		Desc: "test desc",
+		Kind: "testError",
+	}
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	d := err.(*Error).Desc
+	s := "test desc"
+	if d != s {
+		t.Fatalf("expected %s to equal %s", d, s)
+	}
+}
+
+func Test_ErrorHandler_Docs_1(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := fmt.Errorf("test error")
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	d := err.(*Error).Docs
+	s := "https://github.com/giantswarm/microerror"
+	if d != s {
+		t.Fatalf("expected %s to equal %s", d, s)
+	}
+}
+
+func Test_ErrorHandler_Docs_2(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := &Error{
+		Docs: "test desc",
+		Kind: "testError",
+	}
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	d := err.(*Error).Docs
+	s := "test desc"
+	if d != s {
+		t.Fatalf("expected %s to equal %s", d, s)
 	}
 }
