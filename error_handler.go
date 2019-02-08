@@ -68,6 +68,9 @@ func (h *ErrorHandler) Mask(err error) error {
 		if w.Docs != "" {
 			e.Docs = w.Docs
 		}
+		if w.Kind != "" {
+			e.Kind = w.Kind
+		}
 		e.Stack = append(e.Stack, w.Stack...)
 	}
 

@@ -373,3 +373,35 @@ func Test_ErrorHandler_Docs_2(t *testing.T) {
 		t.Fatalf("expected %s to equal %s", d, s)
 	}
 }
+
+func Test_ErrorHandler_Kind_1(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := fmt.Errorf("test error")
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	d := err.(*Error).Kind
+	s := "defaultMicroError"
+	if d != s {
+		t.Fatalf("expected %s to equal %s", d, s)
+	}
+}
+
+func Test_ErrorHandler_Kind_2(t *testing.T) {
+	h := NewErrorHandler(ErrorHandlerConfig{})
+
+	e := &Error{
+		Kind: "testKind",
+	}
+
+	err := h.Mask(e)
+	err = h.Mask(err)
+
+	d := err.(*Error).Kind
+	s := "testKind"
+	if d != s {
+		t.Fatalf("expected %s to equal %s", d, s)
+	}
+}
