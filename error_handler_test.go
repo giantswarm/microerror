@@ -1,12 +1,13 @@
 package microerror
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"testing"
 )
 
-func Test_ErrorHandler_Error(t *testing.T) {
+func Test_ErrorHandler_Error_DELETEME(t *testing.T) {
 	testCases := []struct {
 		Name            string
 		ErrorFunc       func() string
@@ -70,7 +71,6 @@ func Test_ErrorHandler_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			message := tc.ErrorFunc()
-
 			if message != tc.ExpectedMessage {
 				t.Fatalf("expected %s got %s", tc.ExpectedMessage, message)
 			}
@@ -235,7 +235,7 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			err := tc.ErrorFunc()
 
-			e, ok := err.(*Error)
+			e, ok := err.(*maskedError)
 			if !ok {
 				t.Fatalf("expected %T got %T", &Error{}, err)
 			}
@@ -276,132 +276,176 @@ func Test_ErrorHandler_Mask_Nil(t *testing.T) {
 	}
 }
 
-func Test_ErrorHandler_Cause_1(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := fmt.Errorf("test error")
-
-	err := h.Mask(e)
-	err = h.Mask(err)
-
-	c := h.Cause(err)
-
-	if c != e {
-		t.Fatalf("expected %T to equal %T", c, e)
-	}
-}
-
-func Test_ErrorHandler_Cause_2(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := &Error{
-		Kind: "testError",
-	}
-
-	err := h.Mask(e)
-	err = h.Mask(err)
-
-	c := h.Cause(err)
-
-	if c != e {
-		t.Fatalf("expected %T to equal %T", c, e)
-	}
-}
-
-func Test_ErrorHandler_Desc_1(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := fmt.Errorf("test error")
-
-	err := h.Mask(e)
-	err = h.Mask(err)
-
-	d := err.(*Error).Desc
-	s := "This is the default microerror error. It wraps an arbitrary third party error. See more information in the transported cause and stack."
-	if d != s {
-		t.Fatalf("expected %s to equal %s", d, s)
-	}
-}
-
-func Test_ErrorHandler_Desc_2(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
+func Test_ErrorHandler_Maskf(t *testing.T) {
+	c := ErrorHandlerConfig{}
+	h := NewErrorHandler(c)
 
 	e := &Error{
 		Desc: "test desc",
 		Kind: "testError",
 	}
 
-	err := h.Mask(e)
+	err := h.Maskf(e, "test %#q", "format")
+	err = h.Mask(err)
 	err = h.Mask(err)
 
-	d := err.(*Error).Desc
-	s := "test desc"
-	if d != s {
-		t.Fatalf("expected %s to equal %s", d, s)
+	m := err.Error()
+	s := "test error: test `format`"
+	if m != s {
+		t.Fatalf("expected %s to equal %s", m, s)
 	}
 }
 
-func Test_ErrorHandler_Docs_1(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
+func Test_ErrorHandler_Error(t *testing.T) {
+	testCases := []struct {
+		name            string
+		inputError      func(h *ErrorHandler) error
+		expectedMessage string
+	}{
+		{
+			name: "case 0",
+			inputError: func(h *ErrorHandler) error {
+				e := fmt.Errorf("test error")
 
-	e := fmt.Errorf("test error")
+				err := h.Mask(e)
+				err = h.Mask(err)
+				err = h.Mask(err)
 
-	err := h.Mask(e)
-	err = h.Mask(err)
+				return err
+			},
+			expectedMessage: "test error",
+		},
+		{
+			name: "case 1",
+			inputError: func(h *ErrorHandler) error {
+				e := &Error{
+					Kind: "testError",
+				}
 
-	d := err.(*Error).Docs
-	s := "https://github.com/giantswarm/microerror"
-	if d != s {
-		t.Fatalf("expected %s to equal %s", d, s)
+				err := h.Mask(e)
+				err = h.Mask(err)
+				err = h.Mask(err)
+
+				return err
+			},
+			expectedMessage: "test error",
+		},
+		{
+			name: "case 2: Maskf and Mask",
+			inputError: func(h *ErrorHandler) error {
+				e := &Error{
+					Kind: "testError",
+				}
+
+				err := h.Maskf(e, "additional runtime info")
+				err = h.Mask(err)
+				err = h.Mask(err)
+
+				return err
+			},
+			expectedMessage: "test error: additional runtime info",
+		},
+		{
+			name: "case 3: only Maskf",
+			inputError: func(h *ErrorHandler) error {
+				e := &Error{
+					Kind: "testError",
+				}
+
+				err := h.Maskf(e, "additional runtime info")
+
+				return err
+			},
+			expectedMessage: "test error: additional runtime info",
+		},
+		{
+			name: "case 3: no masking on *Error",
+			inputError: func(h *ErrorHandler) error {
+				e := &Error{
+					Kind: "testError",
+				}
+
+				return e
+			},
+			expectedMessage: "test error",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			h := NewErrorHandler(ErrorHandlerConfig{})
+
+			err := tc.inputError(h)
+
+			message := err.Error()
+			if message != tc.expectedMessage {
+				t.Fatalf("expected %q to equal %q", message, tc.expectedMessage)
+			}
+		})
 	}
 }
 
-func Test_ErrorHandler_Docs_2(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := &Error{
-		Docs: "test desc",
-		Kind: "testError",
+func Test_ErrorHandler_JSON(t *testing.T) {
+	testCases := []struct {
+		name         string
+		inputError   error
+		expectedKind string
+		expectedDesc string
+		expectedDocs string
+	}{
+		{
+			name:         "case 0: non *Error",
+			inputError:   fmt.Errorf("test error"),
+			expectedDesc: defaultError.Desc,
+			expectedDocs: defaultError.Docs,
+			expectedKind: defaultError.Kind,
+		},
+		{
+			name: "case 1: *Error",
+			inputError: &Error{
+				Desc: "Test description.",
+				Docs: "https://giantswarm.io",
+				Kind: "testError",
+			},
+			expectedDesc: "Test description.",
+			expectedDocs: "https://giantswarm.io",
+			expectedKind: "testError",
+		},
 	}
 
-	err := h.Mask(e)
-	err = h.Mask(err)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			h := NewErrorHandler(ErrorHandlerConfig{})
 
-	d := err.(*Error).Docs
-	s := "test desc"
-	if d != s {
-		t.Fatalf("expected %s to equal %s", d, s)
-	}
-}
+			err := h.Mask(tc.inputError)
+			err = h.Mask(err)
 
-func Test_ErrorHandler_Kind_1(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
+			bytes, err := json.Marshal(err)
+			if err != nil {
+				t.Fatalf("expected error %v to be non nil", err)
+			}
 
-	e := fmt.Errorf("test error")
+			// TODO Create a separate type for that.
+			v := struct {
+				Desc string `json:"desc"`
+				Docs string `json:"docs"`
+				Kind string `json:"kind"`
+			}{}
 
-	err := h.Mask(e)
-	err = h.Mask(err)
+			err = json.Unmarshal(bytes, &v)
+			if err != nil {
+				t.Fatalf("expected error %v to be non nil", err)
+			}
 
-	d := err.(*Error).Kind
-	s := "defaultMicroError"
-	if d != s {
-		t.Fatalf("expected %s to equal %s", d, s)
-	}
-}
-
-func Test_ErrorHandler_Kind_2(t *testing.T) {
-	h := NewErrorHandler(ErrorHandlerConfig{})
-
-	e := &Error{
-		Kind: "testKind",
-	}
-
-	err := h.Mask(e)
-	err = h.Mask(err)
-
-	d := err.(*Error).Kind
-	s := "testKind"
-	if d != s {
-		t.Fatalf("expected %s to equal %s", d, s)
+			if v.Desc != tc.expectedDesc {
+				t.Fatalf("expected %q to equal %q", v.Desc, tc.expectedDesc)
+			}
+			if v.Docs != tc.expectedDocs {
+				t.Fatalf("expected %q to equal %q", v.Docs, tc.expectedDocs)
+			}
+			if v.Kind != tc.expectedKind {
+				t.Fatalf("expected %q to equal %q", v.Kind, tc.expectedKind)
+			}
+		})
 	}
 }

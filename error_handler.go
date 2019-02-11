@@ -1,6 +1,7 @@
 package microerror
 
 import (
+	"fmt"
 	"runtime"
 )
 
@@ -18,21 +19,17 @@ type ErrorHandler struct {
 
 func NewErrorHandler(config ErrorHandlerConfig) *ErrorHandler {
 	return &ErrorHandler{
-		callDepth: config.CallDepth + 1, // +1 for ErrorHandler wrapping methods
+		callDepth: config.CallDepth + 2, // +2 for ErrorHandler wrapping methods
 	}
 }
 
 func (h *ErrorHandler) Cause(err error) error {
-	e, ok := err.(*Error)
-	if !ok {
-		return err
+	e, ok := err.(*maskedError)
+	if ok {
+		return e.Cause.error
 	}
 
-	if e.Cause != nil {
-		return e.Cause
-	}
-
-	return e
+	return nil
 }
 
 // Mask wraps an error to record its stack. All errors should be masked along
@@ -54,28 +51,31 @@ func (h *ErrorHandler) Cause(err error) error {
 // forwarded to the next caller.
 //
 func (h *ErrorHandler) Mask(err error) error {
+	return h.mask(err, "")
+}
+
+// Maskf is like Mask. In addition to that it takes a format string and
+// variadic arguments like fmt.Sprintf. The format string and variadic
+// arguments are used to annotate the given error.
+func (h *ErrorHandler) Maskf(err error, f string, v ...interface{}) error {
+	msg := fmt.Sprintf(f, v...)
+
+	return h.mask(err, msg)
+}
+
+func (h *ErrorHandler) mask(err error, msg string) error {
 	if err == nil {
 		return nil
 	}
 
-	e := newDefaultError()
-	e.Cause = h.Cause(err)
-	w, ok := err.(*Error)
-	if ok {
-		if w.Desc != "" {
-			e.Desc = w.Desc
-		}
-		if w.Docs != "" {
-			e.Docs = w.Docs
-		}
-		if w.Kind != "" {
-			e.Kind = w.Kind
-		}
-		e.Stack = append(e.Stack, w.Stack...)
+	e := newMaskedError(err)
+
+	if len(msg) > 0 {
+		e.Cause.Annotation = msg
 	}
 
 	_, f, l, _ := runtime.Caller(h.callDepth)
-	s := Stack{
+	s := maskedErrorStack{
 		File: f,
 		Line: l,
 	}

@@ -11,4 +11,8 @@ type Handler interface {
 	// source code. Inspecting an masked error shows where the error was passed
 	// through within the code base. This is gold for debugging and bug hunting.
 	Mask(err error) error
+	// Maskf is like Mask. In addition to that it takes a format string and
+	// variadic arguments like fmt.Sprintf. The format string and variadic
+	// arguments are used to annotate the given error.
+	Maskf(err error, f string, v ...interface{}) error
 }

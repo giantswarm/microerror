@@ -2,11 +2,9 @@
 // convenient and efficient error handling.
 package microerror
 
-var (
-	handler Handler = NewErrorHandler(ErrorHandlerConfig{
-		CallDepth: 1,
-	})
-)
+var handler Handler = NewErrorHandler(ErrorHandlerConfig{
+	CallDepth: 1,
+})
 
 // Cause returns the cause of the given error. If the cause of the err can not
 // be found it returns the err itself. Cause is the usual way to diagnose errors
