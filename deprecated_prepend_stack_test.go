@@ -2,7 +2,7 @@ package microerror
 
 import "testing"
 
-func Test_DeprecatedSetStack_1(t *testing.T) {
+func Test_DeprecatedPrependStack_1(t *testing.T) {
 	c := ErrorHandlerConfig{}
 	h := NewErrorHandler(c)
 
@@ -22,7 +22,8 @@ func Test_DeprecatedSetStack_1(t *testing.T) {
 		},
 	}
 
-	err := h.Maskf(DeprecatedSetStack(e1, e2), e2.Error())
+	err := h.Maskf(e1, e2.Error())
+	err = DeprecatedPrependStack(err, e2)
 	err = h.Mask(err)
 	err = h.Mask(err)
 
@@ -38,7 +39,7 @@ func Test_DeprecatedSetStack_1(t *testing.T) {
 	}
 }
 
-func Test_DeprecatedSetStack_2(t *testing.T) {
+func Test_DeprecatedPrependStack_2(t *testing.T) {
 	c := ErrorHandlerConfig{}
 	h := NewErrorHandler(c)
 
@@ -58,7 +59,8 @@ func Test_DeprecatedSetStack_2(t *testing.T) {
 		},
 	}
 
-	err := h.Maskf(DeprecatedSetStack(e1, e2), e2.Error())
+	err := h.Maskf(e1, e2.Error())
+	err = DeprecatedPrependStack(err, e2)
 	err = h.Mask(err)
 	err = h.Mask(err)
 

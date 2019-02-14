@@ -7,77 +7,6 @@ import (
 	"testing"
 )
 
-func Test_ErrorHandler_Error_DELETEME(t *testing.T) {
-	testCases := []struct {
-		Name            string
-		ErrorFunc       func() string
-		ExpectedMessage string
-	}{
-		{
-			Name: "Case 0",
-			ErrorFunc: func() string {
-				c := ErrorHandlerConfig{}
-				h := NewErrorHandler(c)
-
-				e := fmt.Errorf("test error")
-
-				err := h.Mask(e)
-				err = h.Mask(err)
-
-				return err.Error()
-			},
-			ExpectedMessage: "test error",
-		},
-		{
-			Name: "Case 1",
-			ErrorFunc: func() string {
-				c := ErrorHandlerConfig{}
-				h := NewErrorHandler(c)
-
-				e := &Error{
-					Kind: "testError",
-				}
-
-				err := h.Mask(e)
-				err = h.Mask(e)
-				err = h.Mask(err)
-
-				return err.Error()
-			},
-			ExpectedMessage: "test error",
-		},
-		{
-			Name: "Case 2",
-			ErrorFunc: func() string {
-				err := &Error{
-					Kind: "testError",
-				}
-
-				return err.Error()
-			},
-			ExpectedMessage: "test error",
-		},
-		{
-			Name: "Case 3",
-			ErrorFunc: func() string {
-				err := &Error{}
-
-				return err.Error()
-			},
-			ExpectedMessage: "",
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
-			message := tc.ErrorFunc()
-			if message != tc.ExpectedMessage {
-				t.Fatalf("expected %s got %s", tc.ExpectedMessage, message)
-			}
-		})
-	}
-}
-
 func Test_ErrorHandler_Stack(t *testing.T) {
 	testCases := []struct {
 		Name          string
@@ -101,7 +30,7 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				96,
+				25,
 			},
 		},
 		{
@@ -122,8 +51,8 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				115,
-				116,
+				44,
+				45,
 			},
 		},
 		{
@@ -148,9 +77,9 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				137,
-				138,
-				141,
+				66,
+				67,
+				70,
 			},
 		},
 		{
@@ -175,9 +104,9 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				166,
-				167,
-				168,
+				95,
+				96,
+				97,
 			},
 		},
 		{
@@ -198,8 +127,8 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				191,
-				192,
+				120,
+				121,
 			},
 		},
 		{
@@ -224,9 +153,9 @@ func Test_ErrorHandler_Stack(t *testing.T) {
 				"error_handler_test.go",
 			},
 			ExpectedLines: []int{
-				213,
-				214,
-				217,
+				142,
+				143,
+				146,
 			},
 		},
 	}

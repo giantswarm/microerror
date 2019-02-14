@@ -14,18 +14,18 @@ func IsDefault(err error) bool {
 // Error is a predefined error structure whose purpose is to act as container
 // for meta information associated to a specific error. The specific error type
 // matching can be used as usual. The usual error masking and cause gathering
-// can be used as usual. Using Error might look as follows. In the beginning is
+// should be used. Using Error might look as follows. In the beginning is
 // a usual error defined, along with its matcher. This error is the root cause
 // once emitted during runtime.
 //
 //	runtimevar notEnoughWorkersError = &microerror.Error{
-//         Docs: "https://github.com/giantswarm/ops-recipes/blob/master/349-not-enough-workers.md",
-//         Kind: "notEnoughWorkersError",
-//     }
+//	    Docs: "https://github.com/giantswarm/ops-recipes/blob/master/349-not-enough-workers.md",
+//	    Kind: "notEnoughWorkersError",
+//	}
 //
-//     func IsNotEnoughWorkers(err error) bool {
-//         return microerror.Cause(err) == notEnoughWorkersError
-//     }
+//	func IsNotEnoughWorkers(err error) bool {
+//	    return microerror.Cause(err) == notEnoughWorkersError
+//	}
 //
 type Error struct {
 	Desc string `json:"desc,omitempty"`

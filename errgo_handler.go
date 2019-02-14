@@ -55,7 +55,7 @@ func (h *ErrgoHandler) Mask(err error) error {
 	return newErr
 }
 
-func (h *ErrgoHandler) Maskf(err error, f string, v ...interface{}) error {
+func (h *ErrgoHandler) Maskf(err *Error, f string, v ...interface{}) error {
 	if err == nil {
 		return nil
 	}
