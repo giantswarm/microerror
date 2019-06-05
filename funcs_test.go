@@ -2,6 +2,7 @@ package microerror
 
 import (
 	"errors"
+	"go/build"
 	"reflect"
 	"strconv"
 	"testing"
@@ -16,7 +17,7 @@ func Test_Stack(t *testing.T) {
 		{
 			name:          "case 0: annotated microerror error",
 			inputErr:      Maskf(&Error{Kind: "testKind"}, "annotation"),
-			expectedStack: "[{/go/src/github.com/giantswarm/microerror/funcs_test.go:18: annotation} {test kind}]",
+			expectedStack: "[{" + build.Default.GOPATH + "/src/github.com/giantswarm/microerror/funcs_test.go:19: annotation} {test kind}]",
 		},
 		{
 			name:          "case 1: non annotated microerror error",
