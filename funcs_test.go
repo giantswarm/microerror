@@ -28,6 +28,11 @@ func Test_Stack(t *testing.T) {
 			inputErr:            errors.New("external error"),
 			expectedStackRegexp: "^external error$",
 		},
+		{
+			name:                "case 3: nil",
+			inputErr:            nil,
+			expectedStackRegexp: "^<nil>$",
+		},
 	}
 
 	for i, tc := range testCases {
