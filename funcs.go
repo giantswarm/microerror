@@ -15,6 +15,10 @@ import (
 //	logger.LogCtx(ctx, "level", "error", "message", "failed to do a thing", "stack", microerror.Stack(err))
 //
 func Stack(err error) string {
+	if err == nil {
+		return "<nil>"
+	}
+
 	switch err.(type) {
 	case *errgo.Err:
 		return fmt.Sprintf("%#v", err)
