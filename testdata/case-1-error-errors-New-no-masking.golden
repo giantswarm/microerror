@@ -1,1 +1,4 @@
-{"kind":"unknown","annotation":"test error"}
+{
+	"kind": "unknown",
+	"annotation": "test error"
+}

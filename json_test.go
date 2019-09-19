@@ -1,6 +1,8 @@
 package microerror
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"flag"
 	"io/ioutil"
@@ -95,6 +97,11 @@ func Test_JSON(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			actual := JSON(tc.inputErrorFunc())
+			{
+				b := &bytes.Buffer{}
+				json.Indent(b, []byte(actual), "", "\t")
+				actual = b.String()
+			}
 			// Change paths to avoid prefixes like
 			// "/Users/username/go/src/" so this can test can be
 			// executed on different machines.
