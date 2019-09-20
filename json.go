@@ -13,10 +13,11 @@ import (
 //
 // The rendered JSON can be unmarshalled with JSONError type.
 func JSON(err error) string {
-	if !errors.As(err, &Error{}) && !errors.As(err, &stackedError{}) {
+	microErr := &Error{}
+	if !errors.As(err, &microErr) && !errors.As(err, &stackedError{}) {
 		err = annotatedError{
 			annotation: err.Error(),
-			underlying: Error{
+			underlying: &Error{
 				Kind: kindUnknown,
 			},
 		}

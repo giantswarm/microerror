@@ -14,12 +14,13 @@ type Error struct {
 	Kind string `json:"kind"`
 }
 
-func (e Error) Error() string {
+// TODO Use it as a value.
+func (e *Error) Error() string {
 	return toStringCase(e.Kind)
 }
 
 type JSONError struct {
-	Error `json:",inline"`
+	*Error `json:",inline"`
 
 	Annotation string       `json:"annotation,omitempty"`
 	Stack      []StackEntry `json:"stack,omitempty"`
@@ -32,7 +33,7 @@ type StackEntry struct {
 
 type annotatedError struct {
 	annotation string
-	underlying Error
+	underlying *Error
 }
 
 func (e annotatedError) Error() string {
@@ -83,7 +84,7 @@ func (e stackedError) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	var microErr Error
+	var microErr *Error
 	var annotation string
 	{
 		if errors.As(e, &microErr) {
@@ -92,7 +93,7 @@ func (e stackedError) MarshalJSON() ([]byte, error) {
 				annotation = annotatedErr.annotation
 			}
 		} else {
-			microErr = Error{
+			microErr = &Error{
 				Kind: kindUnknown,
 			}
 

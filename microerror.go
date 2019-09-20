@@ -24,7 +24,7 @@ func Is(err, target error) bool {
 	return errors.Is(err, target)
 }
 
-func Maskf(err Error, f string, v ...interface{}) error {
+func Maskf(err *Error, f string, v ...interface{}) error {
 	annotatedErr := annotatedError{
 		annotation: fmt.Sprintf(f, v...),
 		underlying: err,
@@ -56,8 +56,8 @@ func mask(err error) error {
 // New is here only for backward compatibility purposes and should not be used.
 //
 // NOTE: Use struct initialization literal for Error struct instead.
-func New(kind string) Error {
-	return Error{
+func New(kind string) *Error {
+	return &Error{
 		Kind: kind,
 	}
 }
