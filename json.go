@@ -13,6 +13,9 @@ import (
 //
 // The rendered JSON can be unmarshalled with JSONError type.
 func JSON(err error) string {
+	// This is ugly but this is consequence of us using Error type as
+	// pointer. For being backward compatible we have to use pointer to
+	// a pointer here.
 	microErr := &Error{}
 	if !errors.As(err, &microErr) && !errors.As(err, &stackedError{}) {
 		err = annotatedError{
