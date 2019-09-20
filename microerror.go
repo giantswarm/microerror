@@ -7,6 +7,19 @@ import (
 	"errors"
 )
 
+// Cause is here only for backward compatibility purposes and should not be used.
+//
+// NOTE: Use Is instead.
+func Cause(err error) error {
+	e := err
+	for e != nil {
+		err = e
+		e = errors.Unwrap(err)
+	}
+
+	return err
+}
+
 func Is(err, target error) bool {
 	return errors.Is(err, target)
 }
@@ -37,5 +50,14 @@ func mask(err error) error {
 			Line: line,
 		},
 		underlying: err,
+	}
+}
+
+// New is here only for backward compatibility purposes and should not be used.
+//
+// NOTE: Use struct initialization literal for Error struct instead.
+func New(kind string) Error {
+	return Error{
+		Kind: kind,
 	}
 }

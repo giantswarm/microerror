@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Drop Stack function in favour of JSON function.
+- Drop Newf function.
 - Drop Error.GoString method.
 - Drop Error.String method.
 
