@@ -101,6 +101,9 @@ func Test_JSON(t *testing.T) {
 				b := &bytes.Buffer{}
 				json.Indent(b, []byte(actual), "", "\t")
 				actual = b.String()
+				// Add a newline for editors to stop editors
+				// complaining.
+				actual += "\n"
 			}
 			// Change paths to avoid prefixes like
 			// "/Users/username/go/src/" so this can test can be
