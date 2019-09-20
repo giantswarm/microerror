@@ -14,7 +14,13 @@ type Error struct {
 	Kind string `json:"kind"`
 }
 
-// TODO Use it as a value.
+// GoString is here for backward compatibility.
+//
+// NOTE: Use JSON(err) instead of Printf("%#v", err).
+func (e *Error) GoString() string {
+	return JSON(e)
+}
+
 func (e *Error) Error() string {
 	return toStringCase(e.Kind)
 }
@@ -34,6 +40,13 @@ type StackEntry struct {
 type annotatedError struct {
 	annotation string
 	underlying *Error
+}
+
+// GoString is here for backward compatibility.
+//
+// NOTE: Use JSON(err) instead of Printf("%#v", err).
+func (e annotatedError) GoString() string {
+	return JSON(e)
 }
 
 func (e annotatedError) Error() string {
@@ -65,6 +78,13 @@ func (e annotatedError) Unwrap() error {
 type stackedError struct {
 	stackEntry StackEntry
 	underlying error
+}
+
+// GoString is here for backward compatibility.
+//
+// NOTE: Use JSON(err) instead of Printf("%#v", err).
+func (e stackedError) GoString() string {
+	return JSON(e)
 }
 
 func (e stackedError) Error() string {
