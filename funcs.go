@@ -25,7 +25,7 @@ func Stack(err error) string {
 	}
 }
 
-// Desc returns the description of a microerror.
+// Desc returns the description of a microerror.Error.
 func Desc(err error) string {
 	c := Cause(err)
 	switch c.(type) {
