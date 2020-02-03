@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Error should be defined as a value instead of pointer.
+- Maskf takes only Error type.
 - Use built-in errors package instead of juju/errgo.
 - Print error stacks in JSON format instead of custom errgo format.
 

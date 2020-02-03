@@ -17,16 +17,16 @@ type Error struct {
 // GoString is here for backward compatibility.
 //
 // NOTE: Use JSON(err) instead of Printf("%#v", err).
-func (e *Error) GoString() string {
+func (e Error) GoString() string {
 	return JSON(e)
 }
 
-func (e *Error) Error() string {
+func (e Error) Error() string {
 	return toStringCase(e.Kind)
 }
 
 type JSONError struct {
-	*Error `json:",inline"`
+	Error `json:",inline"`
 
 	Annotation string       `json:"annotation,omitempty"`
 	Stack      []StackEntry `json:"stack,omitempty"`
@@ -39,7 +39,7 @@ type StackEntry struct {
 
 type annotatedError struct {
 	annotation string
-	underlying *Error
+	underlying Error
 }
 
 // GoString is here for backward compatibility.
@@ -104,7 +104,7 @@ func (e stackedError) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	var microErr *Error
+	var microErr Error
 	var annotation string
 	{
 		if errors.As(e, &microErr) {
@@ -113,7 +113,7 @@ func (e stackedError) MarshalJSON() ([]byte, error) {
 				annotation = annotatedErr.annotation
 			}
 		} else {
-			microErr = &Error{
+			microErr = Error{
 				Kind: kindUnknown,
 			}
 
