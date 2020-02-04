@@ -3,6 +3,7 @@ package microerror
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 // JSON prints the error with enriched information in JSON format. Enriched
@@ -13,6 +14,15 @@ import (
 //
 // The rendered JSON can be unmarshalled with JSONError type.
 func JSON(err error) string {
+	if err == nil {
+		err = annotatedError{
+			annotation: fmt.Sprintf("%v", nil),
+			underlying: Error{
+				Kind: kindNil,
+			},
+		}
+	}
+
 	if !errors.As(err, &Error{}) && !errors.As(err, &stackedError{}) {
 		err = annotatedError{
 			annotation: err.Error(),

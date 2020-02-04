@@ -92,6 +92,12 @@ func Test_JSON(t *testing.T) {
 				return err
 			},
 		},
+		{
+			name: "case 8: nil",
+			inputErrorFunc: func() error {
+				return nil
+			},
+		},
 	}
 
 	for i, tc := range testCases {

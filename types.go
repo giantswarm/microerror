@@ -6,7 +6,10 @@ import (
 	"fmt"
 )
 
-const kindUnknown = "unknown"
+const (
+	kindNil     = "nil"
+	kindUnknown = "unknown"
+)
 
 type Error struct {
 	Desc string `json:"desc,omitempty"`
