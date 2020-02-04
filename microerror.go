@@ -48,12 +48,3 @@ func mask(err error) error {
 		underlying: err,
 	}
 }
-
-// New is here only for backward compatibility purposes and should not be used.
-//
-// NOTE: Use struct initialization literal for Error struct instead.
-func New(kind string) Error {
-	return Error{
-		Kind: kind,
-	}
-}
