@@ -202,8 +202,3 @@ func Test_Mask_Error(t *testing.T) {
 		})
 	}
 }
-
-func Test_Mask_New(t *testing.T) {
-	// Whatever New produces it must be applicable to Maskf.
-	Maskf(New("testKind"), "test annotation")
-}
