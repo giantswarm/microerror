@@ -91,6 +91,11 @@ func (e stackedError) Error() string {
 	return e.underlying.Error()
 }
 
+// MarshalJSON unwraps all the stackedError and reconstructs the stack. Then it
+// tries to find annotatedError to find the custom error annotation and finally
+// tries to find Error or just creates one from arbitrary error. Then it sets
+// all the fields to JSONError and finally marshals it using standard
+// json.Marshal call.
 func (e stackedError) MarshalJSON() ([]byte, error) {
 	var stack = []StackEntry{
 		e.stackEntry,
