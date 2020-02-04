@@ -25,7 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drop Error.GoString method.
 - Drop Error.String method.
 
-## [1.0.0] - 2019-09-20
+## [0.1.0] 2020-02-03
 
-[Unreleased]: https://github.com/giantswarm/architect-orb/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/giantswarm/architect-orb/releases/tag/v1.0.0
+### Added
+
+- First release.
+
+[Unreleased]: https://github.com/giantswarm/microerror/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/giantswarm/microerror/releases/tag/v0.1.0
+>>>>>>> master
