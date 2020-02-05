@@ -2,6 +2,7 @@ package microerror
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"testing"
 )
@@ -11,6 +12,7 @@ func Test_Cause(t *testing.T) {
 		Kind: "testCauseErrorB",
 	}
 	var testCauseErrorsNewError = errors.New("test cause error A")
+	var testCauseErrorsNewWrappedError = fmt.Errorf("test cause error B: %w", errors.New("test cause error A"))
 
 	testCases := []struct {
 		name               string
@@ -95,10 +97,21 @@ func Test_Cause(t *testing.T) {
 			},
 			expectedCauseError: testCauseErrorsNewError,
 		},
+		{
+			name: "case 9: Mask depth=3 error=fmt.Printf",
+			inputErrorFunc: func() error {
+				err := Mask(testCauseErrorsNewWrappedError)
+				err = Mask(err)
+				err = Mask(err)
+				return err
+			},
+			expectedCauseError: testCauseErrorsNewWrappedError,
+		},
 	}
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
 			err := tc.inputErrorFunc()
 			cause := Cause(err)
 			if cause != tc.expectedCauseError {
@@ -190,6 +203,16 @@ func Test_Mask_Error(t *testing.T) {
 				return err
 			},
 			expectedError: "test error",
+		},
+		{
+			name: "case 9: Mask depth=3 error=fmt.Printf",
+			inputErrorFunc: func() error {
+				err := Mask(fmt.Errorf("test cause error B: %w", errors.New("test cause error A")))
+				err = Mask(err)
+				err = Mask(err)
+				return err
+			},
+			expectedError: "test cause error B: test cause error A",
 		},
 	}
 

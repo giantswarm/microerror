@@ -11,10 +11,19 @@ import (
 //
 // NOTE: Use errors.Is/errors.As instead.
 func Cause(err error) error {
-	e := err
-	for e != nil {
-		err = e
-		e = errors.Unwrap(err)
+	// If type of err is Error then this is the cause. This also covers all
+	// calls that initiated with Maskf because Maskf takes only Error type.
+	var microErr Error
+	if errors.As(err, &microErr) {
+		return microErr
+	}
+
+	// Now this is known that the masking was initiated with Mask so unwrap
+	// all stackedError and return what's unwrapped from the one at the
+	// bottom of the stack.
+	var stackedErr stackedError
+	for errors.As(err, &stackedErr) {
+		err = stackedErr.Unwrap()
 	}
 
 	return err
