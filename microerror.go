@@ -13,7 +13,7 @@ import (
 func Cause(err error) error {
 	// If type of err is Error then this is the cause. This also covers all
 	// calls that initiated with Maskf because Maskf takes only Error type.
-	var eerr Error
+	var eerr *Error
 	if errors.As(err, &eerr) {
 		return eerr
 	}
@@ -21,7 +21,7 @@ func Cause(err error) error {
 	// Now this is known that the masking was initiated with Mask so unwrap
 	// all stackedError and return what's unwrapped from the one at the
 	// bottom of the stack.
-	var serr stackedError
+	var serr *stackedError
 	for errors.As(err, &serr) {
 		err = serr.Unwrap()
 	}
@@ -29,8 +29,8 @@ func Cause(err error) error {
 	return err
 }
 
-func Maskf(err Error, f string, v ...interface{}) error {
-	aerr := annotatedError{
+func Maskf(err *Error, f string, v ...interface{}) error {
+	aerr := &annotatedError{
 		annotation: fmt.Sprintf(f, v...),
 		underlying: err,
 	}
@@ -49,7 +49,7 @@ func Mask(err error) error {
 func mask(err error) error {
 	_, file, line, _ := runtime.Caller(2)
 
-	return stackedError{
+	return &stackedError{
 		stackEntry: StackEntry{
 			File: file,
 			Line: line,

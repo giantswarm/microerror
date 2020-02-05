@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Cause(t *testing.T) {
-	var testCauseMicroError = Error{
+	var testCauseMicroError = &Error{
 		Kind: "testCauseErrorB",
 	}
 	var testCauseErrorsNewError = errors.New("test cause error A")
@@ -128,7 +128,7 @@ func Test_Mask_Nil(t *testing.T) {
 	}
 }
 
-var testMicroErr = Error{
+var testMicroErr = &Error{
 	Desc: "test-desc",
 	Docs: "test-docs",
 	Kind: "testKind",

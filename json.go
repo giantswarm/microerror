@@ -15,18 +15,20 @@ import (
 // The rendered JSON can be unmarshalled with JSONError type.
 func JSON(err error) string {
 	if err == nil {
-		err = annotatedError{
+		err = &annotatedError{
 			annotation: fmt.Sprintf("%v", nil),
-			underlying: Error{
+			underlying: &Error{
 				Kind: kindNil,
 			},
 		}
 	}
 
-	if !errors.As(err, &Error{}) && !errors.As(err, &stackedError{}) {
-		err = annotatedError{
+	var eerr *Error
+	var serr *stackedError
+	if !errors.As(err, &eerr) && !errors.As(err, &serr) {
+		err = &annotatedError{
 			annotation: err.Error(),
-			underlying: Error{
+			underlying: &Error{
 				Kind: kindUnknown,
 			},
 		}

@@ -20,16 +20,16 @@ type Error struct {
 // GoString is here for backward compatibility.
 //
 // NOTE: Use JSON(err) instead of Printf("%#v", err).
-func (e Error) GoString() string {
+func (e *Error) GoString() string {
 	return JSON(e)
 }
 
-func (e Error) Error() string {
+func (e *Error) Error() string {
 	return toStringCase(e.Kind)
 }
 
 type JSONError struct {
-	Error `json:",inline"`
+	*Error `json:",inline"`
 
 	Annotation string       `json:"annotation,omitempty"`
 	Stack      []StackEntry `json:"stack,omitempty"`
@@ -42,24 +42,24 @@ type StackEntry struct {
 
 type annotatedError struct {
 	annotation string
-	underlying Error
+	underlying *Error
 }
 
 // GoString is here for backward compatibility.
 //
 // NOTE: Use JSON(err) instead of Printf("%#v", err).
-func (e annotatedError) GoString() string {
+func (e *annotatedError) GoString() string {
 	return JSON(e)
 }
 
-func (e annotatedError) Error() string {
+func (e *annotatedError) Error() string {
 	if e.annotation == "" {
 		return e.underlying.Error()
 	}
 	return e.underlying.Error() + ": " + e.annotation
 }
 
-func (e annotatedError) MarshalJSON() ([]byte, error) {
+func (e *annotatedError) MarshalJSON() ([]byte, error) {
 	o := JSONError{
 		Error: e.underlying,
 
@@ -74,7 +74,7 @@ func (e annotatedError) MarshalJSON() ([]byte, error) {
 	return bytes, nil
 }
 
-func (e annotatedError) Unwrap() error {
+func (e *annotatedError) Unwrap() error {
 	return e.underlying
 }
 
@@ -86,11 +86,11 @@ type stackedError struct {
 // GoString is here for backward compatibility.
 //
 // NOTE: Use JSON(err) instead of Printf("%#v", err).
-func (e stackedError) GoString() string {
+func (e *stackedError) GoString() string {
 	return JSON(e)
 }
 
-func (e stackedError) Error() string {
+func (e *stackedError) Error() string {
 	return e.underlying.Error()
 }
 
@@ -99,29 +99,29 @@ func (e stackedError) Error() string {
 // tries to find Error or just creates one from arbitrary error. Then it sets
 // all the fields to JSONError and finally marshals it using standard
 // json.Marshal call.
-func (e stackedError) MarshalJSON() ([]byte, error) {
+func (e *stackedError) MarshalJSON() ([]byte, error) {
 	var stack = []StackEntry{
 		e.stackEntry,
 	}
 	{
 		underlying := e.underlying
-		var stacked stackedError
-		for errors.As(underlying, &stacked) {
-			stack = append([]StackEntry{stacked.stackEntry}, stack...)
-			underlying = stacked.underlying
+		var serr *stackedError
+		for errors.As(underlying, &serr) {
+			stack = append([]StackEntry{serr.stackEntry}, stack...)
+			underlying = serr.underlying
 		}
 	}
 
-	var microErr Error
+	var eerr *Error
 	var annotation string
 	{
-		if errors.As(e, &microErr) {
-			var annotatedErr annotatedError
-			if errors.As(e, &annotatedErr) {
-				annotation = annotatedErr.annotation
+		if errors.As(e, &eerr) {
+			var aerr *annotatedError
+			if errors.As(e, &aerr) {
+				annotation = aerr.annotation
 			}
 		} else {
-			microErr = Error{
+			eerr = &Error{
 				Kind: kindUnknown,
 			}
 
@@ -130,7 +130,7 @@ func (e stackedError) MarshalJSON() ([]byte, error) {
 	}
 
 	o := JSONError{
-		Error: microErr,
+		Error: eerr,
 
 		Annotation: annotation,
 		Stack:      stack,
@@ -144,6 +144,6 @@ func (e stackedError) MarshalJSON() ([]byte, error) {
 	return bytes, nil
 }
 
-func (e stackedError) Unwrap() error {
+func (e *stackedError) Unwrap() error {
 	return e.underlying
 }
