@@ -13,29 +13,29 @@ import (
 func Cause(err error) error {
 	// If type of err is Error then this is the cause. This also covers all
 	// calls that initiated with Maskf because Maskf takes only Error type.
-	var microErr Error
-	if errors.As(err, &microErr) {
-		return microErr
+	var eerr Error
+	if errors.As(err, &eerr) {
+		return eerr
 	}
 
 	// Now this is known that the masking was initiated with Mask so unwrap
 	// all stackedError and return what's unwrapped from the one at the
 	// bottom of the stack.
-	var stackedErr stackedError
-	for errors.As(err, &stackedErr) {
-		err = stackedErr.Unwrap()
+	var serr stackedError
+	for errors.As(err, &serr) {
+		err = serr.Unwrap()
 	}
 
 	return err
 }
 
 func Maskf(err Error, f string, v ...interface{}) error {
-	annotatedErr := annotatedError{
+	aerr := annotatedError{
 		annotation: fmt.Sprintf(f, v...),
 		underlying: err,
 	}
 
-	return mask(annotatedErr)
+	return mask(aerr)
 }
 
 func Mask(err error) error {
