@@ -102,6 +102,8 @@ func Test_JSON(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
 			actual := JSON(tc.inputErrorFunc())
 			{
 				b := &bytes.Buffer{}
@@ -124,7 +126,7 @@ func Test_JSON(t *testing.T) {
 			//	"file":"--REPLACED--/github.com/giantswarm/microerror/json_test.go"
 			//
 			{
-				r := regexp.MustCompile(`("file"\s*:\s*")[/\w]+(/github.com/giantswarm)`)
+				r := regexp.MustCompile(`("file"\s*:\s*")\S+(/[^/"]+.go")`)
 				actual = r.ReplaceAllString(actual, "$1--REPLACED--$2")
 			}
 

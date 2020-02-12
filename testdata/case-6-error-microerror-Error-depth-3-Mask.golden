@@ -4,15 +4,15 @@
 	"kind": "testKind",
 	"stack": [
 		{
-			"file": "--REPLACED--/github.com/giantswarm/microerror/json_test.go",
+			"file": "--REPLACED--/json_test.go",
 			"line": 79
 		},
 		{
-			"file": "--REPLACED--/github.com/giantswarm/microerror/json_test.go",
+			"file": "--REPLACED--/json_test.go",
 			"line": 80
 		},
 		{
-			"file": "--REPLACED--/github.com/giantswarm/microerror/json_test.go",
+			"file": "--REPLACED--/json_test.go",
 			"line": 82
 		}
 	]
