@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add JSON function.
+
+### Changed
+
+- Error should be defined as a value instead of pointer.
+- Maskf takes only Error type.
+- Use built-in errors package instead of juju/errgo.
+- Print error stacks in JSON format instead of custom errgo format.
+
+### Removed
+
+- Drop Error.String method.
+- Drop New function.
+- Drop Newf function.
+- Drop Stack function in favour of JSON function.
+
 ## [0.1.0] 2020-02-03
 
 ### Added
