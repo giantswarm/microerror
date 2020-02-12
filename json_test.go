@@ -126,7 +126,7 @@ func Test_JSON(t *testing.T) {
 			//	"file":"--REPLACED--/github.com/giantswarm/microerror/json_test.go"
 			//
 			{
-				r := regexp.MustCompile(`("file"\s*:\s*")\S+(/json_test\.go")`)
+				r := regexp.MustCompile(`("file"\s*:\s*")\S+(/[^/"]+.go")`)
 				actual = r.ReplaceAllString(actual, "$1--REPLACED--$2")
 			}
 
