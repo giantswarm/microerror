@@ -46,7 +46,8 @@ func prettifyErrorMessage(message string) string {
 
 	for pos := 0; pos < len(r); pos++ {
 		if len(r) > len(prefix) && pos < len(prefix) {
-			// Peek the next chars to see if the message has the prefix.
+			// Peek the next chars to see if the message
+			// has the 'error: ' prefix.
 			for nestedPos, nestedChar = range strings.ToLower(prefix) {
 				if unicode.ToLower(r[pos+nestedPos]) != nestedChar {
 					break
@@ -63,7 +64,8 @@ func prettifyErrorMessage(message string) string {
 		}
 
 		if len(r)+pos > len(suffix) && pos == len(r)-len(suffix) {
-			// Peek the next chars to see if the message has the suffix.
+			// Peek the next chars to see if the message
+			// has the ' error' suffix.
 			for nestedPos, nestedChar = range strings.ToLower(suffix) {
 				if unicode.ToLower(r[pos+nestedPos]) != nestedChar {
 					break
