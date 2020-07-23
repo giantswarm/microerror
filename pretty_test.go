@@ -81,7 +81,29 @@ func TestPretty(t *testing.T) {
 			expectedMessage: "Error: Something went wrong: Something bad happened, and we had to crash",
 		},
 		{
-			name: "case 7: microerror, 1 depth, with multiline annotation",
+			name: "case 7: microerror, 1 depth, unknown kind, with annotation",
+			errorFactory: func() error {
+				err := &Error{
+					Kind: kindUnknown,
+				}
+
+				return Maskf(err, "something bad happened, and we had to crash")
+			},
+			expectedMessage: "Error: Something bad happened, and we had to crash",
+		},
+		{
+			name: "case 8: microerror, 1 depth, nil kind, with annotation",
+			errorFactory: func() error {
+				err := &Error{
+					Kind: kindNil,
+				}
+
+				return Maskf(err, "something bad happened, and we had to crash")
+			},
+			expectedMessage: "Error: Something bad happened, and we had to crash",
+		},
+		{
+			name: "case 9: microerror, 1 depth, with multiline annotation",
 			errorFactory: func() error {
 				err := &Error{
 					Kind: "somethingWentWrongError",
@@ -92,7 +114,7 @@ func TestPretty(t *testing.T) {
 			expectedMessage: "Error: Something went wrong: Something bad happened, and we had to crash\nthat's the first time it happened, really",
 		},
 		{
-			name: "case 8: microerror, 10 depth",
+			name: "case 10: microerror, 10 depth",
 			errorFactory: func() error {
 				err := &Error{
 					Kind: "somethingWentWrongError",
