@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"testing"
 )
 
@@ -138,12 +139,74 @@ func TestPretty(t *testing.T) {
 			},
 			expectedGoldenFile: "pretty-microerror-10-depth.golden",
 		},
+		{
+			name: "case 11: microerror, 1 depth, with stack trace",
+			errorFactory: func() error {
+				err := &Error{
+					Kind: "somethingWentWrongError",
+				}
+
+				return Mask(err)
+			},
+			stackTrace:         true,
+			expectedGoldenFile: "pretty-microerror-1-depth-stack-trace.golden",
+		},
+		{
+			name: "case 12: microerror, 1 depth, with annotation, with stack trace",
+			errorFactory: func() error {
+				err := &Error{
+					Kind: "somethingWentWrongError",
+				}
+
+				return Maskf(err, "something bad happened, and we had to crash")
+			},
+			stackTrace:         true,
+			expectedGoldenFile: "pretty-microerror-1-depth-annotation-stack-trace.golden",
+		},
+		{
+			name: "case 13: microerror, 1 depth, with multiline annotation, with stack trace",
+			errorFactory: func() error {
+				err := &Error{
+					Kind: "somethingWentWrongError",
+				}
+
+				return Maskf(err, "something bad happened, and we had to crash\nthat's the first time it happened, really")
+			},
+			stackTrace:         true,
+			expectedGoldenFile: "pretty-microerror-1-depth-multiline-annotation-stack-trace.golden",
+		},
+		{
+			name: "case 14: microerror, 10 depth, with stack trace",
+			errorFactory: func() error {
+				err := &Error{
+					Kind: "somethingWentWrongError",
+				}
+
+				// Let's build up this stack trace.
+				newErr := Mask(err)
+				for i := 0; i < 10; i++ {
+					newErr = Mask(newErr)
+				}
+
+				return newErr
+			},
+			stackTrace:         true,
+			expectedGoldenFile: "pretty-microerror-10-depth-stack-trace.golden",
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.errorFactory()
 			message := Pretty(err, tc.stackTrace)
+
+			// Change paths to avoid prefixes like
+			// "/Users/username/go/src/" so this can test can be
+			// executed on different machines.
+			{
+				r := regexp.MustCompile(`/.*(/.*\.go:\d+)`)
+				message = r.ReplaceAllString(message, "--REPLACED--$1")
+			}
 
 			var expected string
 			{
