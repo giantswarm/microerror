@@ -46,9 +46,7 @@ func prettifyErrorMessage(message string) string {
 	{
 		// Capitalize the first letter.
 		tmpMessage := []rune(message)
-		if len(tmpMessage) > 0 {
-			tmpMessage[0] = unicode.ToUpper(tmpMessage[0])
-		}
+		tmpMessage[0] = unicode.ToUpper(tmpMessage[0])
 		message = string(tmpMessage)
 	}
 
