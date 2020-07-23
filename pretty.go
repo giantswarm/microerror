@@ -36,8 +36,7 @@ func Pretty(err error, stackTrace bool) string {
 
 	if stackTrace {
 		// Add formatted stack trace.
-		var sErr *stackedError
-		if errors.As(err, &sErr) {
+		if sErr, ok := err.(*stackedError); ok {
 			message.WriteString("\n\n")
 			trace := createStackTrace(sErr)
 			message.WriteString(formatStackTrace(trace))

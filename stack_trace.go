@@ -29,7 +29,10 @@ func formatStackTrace(trace []StackEntry) string {
 	var builder strings.Builder
 	builder.Grow(len(trace))
 
-	for _, stack := range trace {
+	for i, stack := range trace {
+		if i > 0 {
+			builder.WriteString("\n")
+		}
 		builder.WriteString(formatStackEntry(stack))
 	}
 

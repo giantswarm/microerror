@@ -122,7 +122,7 @@ func TestPretty(t *testing.T) {
 
 				// Let's build up this stack trace.
 				newErr := Mask(err)
-				for i := 0; i < 11; i++ {
+				for i := 0; i < 10; i++ {
 					newErr = Mask(newErr)
 				}
 
