@@ -10,7 +10,7 @@ import (
 // This test uses golden files.
 //
 // Run this command to update the snapshots:
-// 'go test . -run Test_formatStackTrace -update'
+// go test . -run Test_formatStackTrace -update
 //
 func Test_formatStackTrace(t *testing.T) {
 	testCases := []struct {

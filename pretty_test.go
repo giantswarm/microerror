@@ -2,14 +2,22 @@ package microerror
 
 import (
 	"errors"
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 )
 
+// This test uses golden files.
+//
+// Run this command to update the snapshots:
+// go test . -run TestPretty -update
+//
 func TestPretty(t *testing.T) {
 	testCases := []struct {
-		name            string
-		errorFactory    func() error
-		expectedMessage string
+		name               string
+		errorFactory       func() error
+		stackTrace         bool
+		expectedGoldenFile string
 	}{
 		{
 			name: "case 0: simple error",
@@ -18,7 +26,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedMessage: "Error: Something went wrong",
+			expectedGoldenFile: "pretty_simple_error.golden",
 		},
 		{
 			name: "case 1: simple empty error",
@@ -27,7 +35,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedMessage: "",
+			expectedGoldenFile: "pretty_simple_empty_error.golden",
 		},
 		{
 			name: "case 2: simple error with 'error:' prefix in message",
@@ -36,7 +44,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedMessage: "Error: Something went wrong",
+			expectedGoldenFile: "pretty_simple_error_with_prefix.golden",
 		},
 		{
 			name: "case 3: masked simple error",
@@ -45,7 +53,7 @@ func TestPretty(t *testing.T) {
 
 				return Mask(err)
 			},
-			expectedMessage: "Error: Something went wrong",
+			expectedGoldenFile: "pretty_masked_simple_error.golden",
 		},
 		{
 			name: "case 4: microerror, 0 depth",
@@ -56,7 +64,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedMessage: "Error: Something went wrong",
+			expectedGoldenFile: "pretty_microerror_0_depth.golden",
 		},
 		{
 			name: "case 5: microerror, 1 depth",
@@ -67,7 +75,7 @@ func TestPretty(t *testing.T) {
 
 				return Mask(err)
 			},
-			expectedMessage: "Error: Something went wrong",
+			expectedGoldenFile: "pretty_microerror_1_depth.golden",
 		},
 		{
 			name: "case 6: microerror, 1 depth, with annotation",
@@ -78,7 +86,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedMessage: "Error: Something went wrong: Something bad happened, and we had to crash",
+			expectedGoldenFile: "pretty_microerror_1_depth_annotation.golden",
 		},
 		{
 			name: "case 7: microerror, 1 depth, unknown kind, with annotation",
@@ -89,7 +97,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedMessage: "Error: Something bad happened, and we had to crash",
+			expectedGoldenFile: "pretty_microerror_1_depth_unknown_kind_annotation.golden",
 		},
 		{
 			name: "case 8: microerror, 1 depth, nil kind, with annotation",
@@ -100,7 +108,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedMessage: "Error: Something bad happened, and we had to crash",
+			expectedGoldenFile: "pretty_microerror_1_depth_unknown_kind_annotation.golden",
 		},
 		{
 			name: "case 9: microerror, 1 depth, with multiline annotation",
@@ -111,7 +119,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash\nthat's the first time it happened, really")
 			},
-			expectedMessage: "Error: Something went wrong: Something bad happened, and we had to crash\nthat's the first time it happened, really",
+			expectedGoldenFile: "pretty_microerror_1_depth_multiline_annotation.golden",
 		},
 		{
 			name: "case 10: microerror, 10 depth",
@@ -128,17 +136,35 @@ func TestPretty(t *testing.T) {
 
 				return newErr
 			},
-			expectedMessage: "Error: Something went wrong",
+			expectedGoldenFile: "pretty_microerror_10_depth.golden",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.errorFactory()
-			message := Pretty(err, false)
+			message := Pretty(err, tc.stackTrace)
 
-			if message != tc.expectedMessage {
-				t.Fatalf("expected %q got %q", tc.expectedMessage, message)
+			var expected string
+			{
+				golden := filepath.Join("testdata", tc.expectedGoldenFile)
+				if *update {
+					err := ioutil.WriteFile(golden, []byte(message), 0644)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+
+				bytes, err := ioutil.ReadFile(golden)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				expected = string(bytes)
+			}
+
+			if message != expected {
+				t.Fatalf("expected %q got %q", expected, message)
 			}
 		})
 	}
