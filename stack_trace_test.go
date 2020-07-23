@@ -62,8 +62,8 @@ func Test_formatStackTrace(t *testing.T) {
 			// "/Users/username/go/src/" so this can test can be
 			// executed on different machines.
 			{
-				r := regexp.MustCompile(`("file"\s*:\s*")\S+(/[^/"]+.go")`)
-				output = r.ReplaceAllString(output, "$1--REPLACED--$2")
+				r := regexp.MustCompile(`.*(/.*\.go:\d+)`)
+				output = r.ReplaceAllString(output, "--REPLACED--$1")
 			}
 
 			var expected string
