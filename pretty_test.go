@@ -135,7 +135,7 @@ func TestPretty(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.errorFactory()
-			message := Pretty(err)
+			message := Pretty(err, false)
 
 			if message != tc.expectedMessage {
 				t.Fatalf("expected %q got %q", tc.expectedMessage, message)

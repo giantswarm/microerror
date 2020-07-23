@@ -11,15 +11,14 @@ const (
 	delimiter = ": "
 )
 
-func Pretty(err error) string {
+func Pretty(err error, stackTrace bool) string {
 	var message strings.Builder
 
 	message.WriteString(prefix)
 
 	// Check if it's an annotated error.
 	var aErr *annotatedError
-	isAnnotatedErr := errors.As(err, &aErr)
-	if isAnnotatedErr {
+	if errors.As(err, &aErr) {
 		if aErr.underlying.Kind != kindNil && aErr.underlying.Kind != kindUnknown {
 			message.WriteString(prettifyErrorMessage(aErr.underlying.Error()))
 			message.WriteString(delimiter)
@@ -33,6 +32,16 @@ func Pretty(err error) string {
 			return ""
 		}
 		message.WriteString(prettifyErrorMessage(err.Error()))
+	}
+
+	if stackTrace {
+		// Add formatted stack trace.
+		var sErr *stackedError
+		if errors.As(err, &sErr) {
+			message.WriteString("\n\n")
+			trace := createStackTrace(sErr)
+			message.WriteString(formatStackTrace(trace))
+		}
 	}
 
 	return message.String()
