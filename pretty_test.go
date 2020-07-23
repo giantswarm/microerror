@@ -26,7 +26,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedGoldenFile: "pretty_simple_error.golden",
+			expectedGoldenFile: "pretty-simple-error.golden",
 		},
 		{
 			name: "case 1: simple empty error",
@@ -35,7 +35,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedGoldenFile: "pretty_simple_empty_error.golden",
+			expectedGoldenFile: "pretty-simple-empty-error.golden",
 		},
 		{
 			name: "case 2: simple error with 'error:' prefix in message",
@@ -44,7 +44,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedGoldenFile: "pretty_simple_error_with_prefix.golden",
+			expectedGoldenFile: "pretty-simple-error-with-prefix.golden",
 		},
 		{
 			name: "case 3: masked simple error",
@@ -53,7 +53,7 @@ func TestPretty(t *testing.T) {
 
 				return Mask(err)
 			},
-			expectedGoldenFile: "pretty_masked_simple_error.golden",
+			expectedGoldenFile: "pretty-masked-simple-error.golden",
 		},
 		{
 			name: "case 4: microerror, 0 depth",
@@ -64,7 +64,7 @@ func TestPretty(t *testing.T) {
 
 				return err
 			},
-			expectedGoldenFile: "pretty_microerror_0_depth.golden",
+			expectedGoldenFile: "pretty-microerror-0-depth.golden",
 		},
 		{
 			name: "case 5: microerror, 1 depth",
@@ -75,7 +75,7 @@ func TestPretty(t *testing.T) {
 
 				return Mask(err)
 			},
-			expectedGoldenFile: "pretty_microerror_1_depth.golden",
+			expectedGoldenFile: "pretty-microerror-1-depth.golden",
 		},
 		{
 			name: "case 6: microerror, 1 depth, with annotation",
@@ -86,7 +86,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedGoldenFile: "pretty_microerror_1_depth_annotation.golden",
+			expectedGoldenFile: "pretty-microerror-1-depth-annotation.golden",
 		},
 		{
 			name: "case 7: microerror, 1 depth, unknown kind, with annotation",
@@ -97,7 +97,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedGoldenFile: "pretty_microerror_1_depth_unknown_kind_annotation.golden",
+			expectedGoldenFile: "pretty-microerror-1-depth-unknown-kind-annotation.golden",
 		},
 		{
 			name: "case 8: microerror, 1 depth, nil kind, with annotation",
@@ -108,7 +108,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedGoldenFile: "pretty_microerror_1_depth_unknown_kind_annotation.golden",
+			expectedGoldenFile: "pretty-microerror-1-depth-unknown-kind-annotation.golden",
 		},
 		{
 			name: "case 9: microerror, 1 depth, with multiline annotation",
@@ -119,7 +119,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash\nthat's the first time it happened, really")
 			},
-			expectedGoldenFile: "pretty_microerror_1_depth_multiline_annotation.golden",
+			expectedGoldenFile: "pretty-microerror-1-depth-multiline-annotation.golden",
 		},
 		{
 			name: "case 10: microerror, 10 depth",
@@ -136,7 +136,7 @@ func TestPretty(t *testing.T) {
 
 				return newErr
 			},
-			expectedGoldenFile: "pretty_microerror_10_depth.golden",
+			expectedGoldenFile: "pretty-microerror-10-depth.golden",
 		},
 	}
 
