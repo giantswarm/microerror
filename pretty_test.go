@@ -78,7 +78,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash")
 			},
-			expectedMessage: "Error: Something bad happened, and we had to crash",
+			expectedMessage: "Error: Something went wrong: Something bad happened, and we had to crash",
 		},
 		{
 			name: "case 7: microerror, 1 depth, with multiline annotation",
@@ -89,7 +89,7 @@ func TestPretty(t *testing.T) {
 
 				return Maskf(err, "something bad happened, and we had to crash\nthat's the first time it happened, really")
 			},
-			expectedMessage: "Error: Something bad happened, and we had to crash\nthat's the first time it happened, really",
+			expectedMessage: "Error: Something went wrong: Something bad happened, and we had to crash\nthat's the first time it happened, really",
 		},
 		{
 			name: "case 8: microerror, 10 depth",

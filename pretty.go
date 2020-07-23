@@ -7,27 +7,35 @@ import (
 )
 
 const (
-	prefix = "Error: "
-	suffix = " error"
+	prefix    = "Error: "
+	delimiter = ": "
 )
 
 func Pretty(err error) string {
-	var message string
+	var message strings.Builder
+
+	message.WriteString(prefix)
 
 	// Check if it's an annotated error.
 	var aErr *annotatedError
 	isAnnotatedErr := errors.As(err, &aErr)
 	if isAnnotatedErr {
-		message = aErr.annotation
+		if aErr.underlying.Kind != kindNil && aErr.underlying.Kind != kindUnknown {
+			message.WriteString(prettifyErrorMessage(aErr.underlying.Error()))
+			message.WriteString(delimiter)
+		}
+		message.WriteString(prettifyErrorMessage(aErr.annotation))
 	} else {
 		// This is either an unmasked microerror, or
 		// a simple 'errors.New()' error.
-		message = err.Error()
+		pretty := prettifyErrorMessage(err.Error())
+		if len(pretty) < 1 {
+			return ""
+		}
+		message.WriteString(prettifyErrorMessage(err.Error()))
 	}
 
-	message = prettifyErrorMessage(message)
-
-	return message
+	return message.String()
 }
 
 func prettifyErrorMessage(message string) string {
@@ -49,8 +57,6 @@ func prettifyErrorMessage(message string) string {
 		tmpMessage[0] = unicode.ToUpper(tmpMessage[0])
 		message = string(tmpMessage)
 	}
-
-	message = prefix + message
 
 	return message
 }
