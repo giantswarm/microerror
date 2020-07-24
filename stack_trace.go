@@ -22,7 +22,7 @@ func createStackTrace(err *stackedError) []StackEntry {
 }
 
 func formatStackEntry(entry StackEntry) string {
-	return fmt.Sprintf("%s:%d", entry.File, entry.Line)
+	return fmt.Sprintf("\t%s:%d", entry.File, entry.Line)
 }
 
 func formatStackTrace(trace []StackEntry) string {
