@@ -7,14 +7,12 @@ import (
 )
 
 const (
-	prefix    = "Error: "
+	prefix    = "error: "
 	delimiter = ": "
 )
 
 func Pretty(err error, stackTrace bool) string {
 	var message strings.Builder
-
-	message.WriteString(prefix)
 
 	// Check if it's an annotated error.
 	var aErr *annotatedError
@@ -51,8 +49,8 @@ func prettifyErrorMessage(message string) string {
 		return message
 	}
 
-	// Remove the 'Error: ' prefix if it exists
-	if strings.HasPrefix(strings.ToLower(message), strings.ToLower(prefix)) {
+	// Remove the 'error: ' prefix if it exists
+	if strings.HasPrefix(strings.ToLower(message), prefix) {
 		message = message[len(prefix):]
 	}
 	// This suffix is usually present in microerrors
