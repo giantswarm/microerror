@@ -17,19 +17,22 @@ func Pretty(err error, stackTrace bool) string {
 	// Check if it's an annotated error.
 	var aErr *annotatedError
 	if errors.As(err, &aErr) {
+		capitalizeAnnotation := true
+
 		if aErr.underlying.Kind != kindNil && aErr.underlying.Kind != kindUnknown {
-			message.WriteString(prettifyErrorMessage(aErr.underlying.Error()))
+			message.WriteString(prettifyErrorMessage(aErr.underlying.Error(), true))
 			message.WriteString(delimiter)
+			capitalizeAnnotation = false
 		}
-		message.WriteString(prettifyErrorMessage(aErr.annotation))
+		message.WriteString(prettifyErrorMessage(aErr.annotation, capitalizeAnnotation))
 	} else {
 		// This is either an unmasked microerror, or
 		// a simple 'errors.New()' error.
-		pretty := prettifyErrorMessage(err.Error())
+		pretty := prettifyErrorMessage(err.Error(), true)
 		if len(pretty) < 1 {
 			return ""
 		}
-		message.WriteString(prettifyErrorMessage(err.Error()))
+		message.WriteString(pretty)
 	}
 
 	if stackTrace {
@@ -44,7 +47,7 @@ func Pretty(err error, stackTrace bool) string {
 	return message.String()
 }
 
-func prettifyErrorMessage(message string) string {
+func prettifyErrorMessage(message string, capitalize bool) string {
 	if len(message) < 1 {
 		return message
 	}
@@ -57,7 +60,7 @@ func prettifyErrorMessage(message string) string {
 	// without annotations.
 	message = strings.TrimSuffix(message, " error")
 
-	{
+	if capitalize {
 		// Capitalize the first letter.
 		tmpMessage := []rune(message)
 		tmpMessage[0] = unicode.ToUpper(tmpMessage[0])
