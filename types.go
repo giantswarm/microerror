@@ -149,19 +149,3 @@ func (e *stackedError) StackTrace() []uintptr {
 func (e *stackedError) Unwrap() error {
 	return e.underlying
 }
-
-func (e *stackedError) extractStackTrace() []StackEntry {
-	var stack = []StackEntry{
-		e.stackEntry,
-	}
-	{
-		underlying := e.underlying
-		var serr *stackedError
-		for errors.As(underlying, &serr) {
-			stack = append([]StackEntry{serr.stackEntry}, stack...)
-			underlying = serr.underlying
-		}
-	}
-
-	return stack
-}
