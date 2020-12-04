@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added new StackTrace public method to expose stack traces. Compliant with Sentry.
+
 ## [0.2.1] 2020-07-24
 
 ### Added

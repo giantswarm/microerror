@@ -38,7 +38,7 @@ type JSONError struct {
 type StackEntry struct {
 	File string  `json:"file"`
 	Line int     `json:"line"`
-	PC   uintptr `json:"pc"`
+	PC   uintptr `json:"-"`
 }
 
 type annotatedError struct {
