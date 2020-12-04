@@ -136,7 +136,7 @@ func (e *stackedError) MarshalJSON() ([]byte, error) {
 }
 
 func (e *stackedError) StackTrace() []uintptr {
-	stack := e.extractStackTrace()
+	stack := createStackTrace(e)
 
 	var pcs []uintptr
 	for _, e := range stack {
