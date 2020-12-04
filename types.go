@@ -101,7 +101,7 @@ func (e *stackedError) Error() string {
 // all the fields to JSONError and finally marshals it using standard
 // json.Marshal call.
 func (e *stackedError) MarshalJSON() ([]byte, error) {
-	stack := e.extractStackTrace()
+	stack := createStackTrace(e)
 
 	var eerr *Error
 	var annotation string
