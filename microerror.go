@@ -47,14 +47,9 @@ func Mask(err error) error {
 }
 
 func mask(err error) error {
-	i := 0
-	for i < 3 {
-		pc, file, line, _ := runtime.Caller(i)
-		fmt.Printf("%d: pc = %d, file = %s, line = %d\n", i, pc, file, line)
-		i += 1
-	}
-
 	pc, file, line, _ := runtime.Caller(2)
+
+	fmt.Printf("pc = %d, file = %s, line = %d\n", pc, file, line)
 
 	return &stackedError{
 		stackEntry: StackEntry{
