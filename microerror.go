@@ -55,7 +55,7 @@ func mask(err error) error {
 		stackEntry: StackEntry{
 			File: file,
 			Line: line,
-			PC:   pc,
+			PC:   pc + 1,
 		},
 		underlying: err,
 	}
