@@ -49,10 +49,9 @@ jobs:
         run: |
           if gh pr view --repo ${{ github.repository }} ${{ github.event.ref }} | grep -i 'state:[[:space:]]*open' >/dev/null; then
             gh pr view --repo ${{ github.repository }} ${{ github.event.ref }}
-            echo "::info::Release PR already exists"
+            echo "::warning::Release PR already exists"
             echo "::set-output name=skip::true"
           else
-            echo "::info::Release PR does not exist"
             echo "::set-output name=skip::false"
           fi
   create_release_pr:
