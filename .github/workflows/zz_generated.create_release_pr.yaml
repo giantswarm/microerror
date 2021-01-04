@@ -47,7 +47,8 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
-          if gh pr view --repo ${{ github.repository }} ${{ github.event.ref }} ; then
+          if gh pr view --repo ${{ github.repository }} ${{ github.event.ref }} | grep -i 'state:[[:space:]]*open' >/dev/null; then
+            gh pr view --repo ${{ github.repository }} ${{ github.event.ref }}
             echo "::warning::Release PR already exists"
             echo "::set-output name=skip::true"
           else
