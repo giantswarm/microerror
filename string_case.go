@@ -1,9 +1,26 @@
 package microerror
 
 import (
+	"bytes"
+	"regexp"
 	"strings"
 	"unicode"
 )
+
+var whitespaceRe = regexp.MustCompile(`\s`)
+
+func toCamelCase(s string) string {
+	if !whitespaceRe.MatchString(s) {
+		return strings.ToLower(s)
+	}
+
+	bs := []byte(s)
+	loc := whitespaceRe.FindIndex(bs)
+
+	copy(bs, bytes.ToLower(bs[0:loc[0]]))
+	copy(bs[loc[0]:], bytes.Title(bs[loc[0]:]))
+	return string(whitespaceRe.ReplaceAllLiteral(bs, []byte("")))
+}
 
 func toStringCase(input string) string {
 	chunks := []string{}

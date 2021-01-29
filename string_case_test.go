@@ -1,8 +1,55 @@
 package microerror
 
 import (
+	"reflect"
+	"strconv"
 	"testing"
 )
+
+func Test_toCamelCase(t *testing.T) {
+	testCases := []struct {
+		name      string
+		inputStr  string
+		expectStr string
+	}{
+		{
+			name:      "case 0",
+			inputStr:  "not found error",
+			expectStr: "notFoundError",
+		},
+		{
+			name:      "case 1",
+			inputStr:  "URL not found error",
+			expectStr: "urlNotFoundError",
+		},
+		{
+			name:      "case 2",
+			inputStr:  "NOT FOUND ERROR",
+			expectStr: "notFOUNDERROR",
+		},
+		{
+			name:      "case 3",
+			inputStr:  "UPPER",
+			expectStr: "upper",
+		},
+		{
+			name:      "case 4",
+			inputStr:  "lower",
+			expectStr: "lower",
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			str := toCamelCase(tc.inputStr)
+			if !reflect.DeepEqual(str, tc.expectStr) {
+				t.Fatalf("str = %v, want %v", str, tc.expectStr)
+			}
+		})
+	}
+}
 
 func Test_toStringCase(t *testing.T) {
 	testCases := []struct {

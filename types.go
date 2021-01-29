@@ -15,6 +15,25 @@ type Error struct {
 	Desc string `json:"desc,omitempty"`
 	Docs string `json:"docs,omitempty"`
 	Kind string `json:"kind"`
+
+	parent *Error
+}
+
+func New(s string) *Error {
+	return &Error{
+		Kind: toCamelCase(s),
+	}
+}
+
+// FromParent produces error that can be also matched by its parent.
+func FromParent(err *Error) *Error {
+	return &Error{
+		Desc: err.Desc,
+		Docs: err.Docs,
+		Kind: err.Kind,
+
+		parent: err,
+	}
 }
 
 // GoString is here for backward compatibility.
@@ -26,6 +45,14 @@ func (e *Error) GoString() string {
 
 func (e *Error) Error() string {
 	return toStringCase(e.Kind)
+}
+
+func (e *Error) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+
+	return e.parent
 }
 
 type JSONError struct {
@@ -76,6 +103,10 @@ func (e *annotatedError) MarshalJSON() ([]byte, error) {
 }
 
 func (e *annotatedError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+
 	return e.underlying
 }
 
