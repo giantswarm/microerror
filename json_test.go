@@ -23,7 +23,6 @@ var update = flag.Bool("update", false, "update resource.golden file")
 // intentional, they can be updated by providing -update flag for go test.
 //
 //	go test ./ -run Test_JSON -update
-//
 func Test_JSON(t *testing.T) {
 	testCases := []struct {
 		name           string
