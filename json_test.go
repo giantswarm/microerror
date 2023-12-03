@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -106,7 +106,10 @@ func Test_JSON(t *testing.T) {
 			actual := JSON(tc.inputErrorFunc())
 			{
 				b := &bytes.Buffer{}
-				json.Indent(b, []byte(actual), "", "\t")
+				err := json.Indent(b, []byte(actual), "", "\t")
+				if err != nil {
+					t.Fatal(err)
+				}
 				actual = b.String()
 				// Add a newline for editors to stop editors
 				// complaining.
@@ -133,13 +136,13 @@ func Test_JSON(t *testing.T) {
 			{
 				golden := filepath.Join("testdata", normalizeToFileName(tc.name)+".golden")
 				if *update {
-					err := ioutil.WriteFile(golden, []byte(actual), 0644)
+					err := os.WriteFile(golden, []byte(actual), 0644) //nolint:gosec
 					if err != nil {
 						t.Fatal(err)
 					}
 				}
 
-				bytes, err := ioutil.ReadFile(golden)
+				bytes, err := os.ReadFile(golden)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -158,7 +161,7 @@ func Test_JSON(t *testing.T) {
 // to dash ('-'). Coalesces multiple dashes into one.
 func normalizeToFileName(s string) string {
 	var result []rune
-	for _, r := range []rune(s) {
+	for _, r := range []rune(s) { //nolint:gosimple,staticcheck
 		if unicode.IsDigit(r) || unicode.IsLetter(r) {
 			result = append(result, r)
 		} else {
