@@ -2,7 +2,7 @@ package microerror
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
@@ -12,7 +12,6 @@ import (
 //
 // Run this command to update the snapshots:
 // go test . -run TestPretty -update
-//
 func TestPretty(t *testing.T) {
 	testCases := []struct {
 		name               string
@@ -212,13 +211,13 @@ func TestPretty(t *testing.T) {
 			{
 				golden := filepath.Join("testdata", tc.expectedGoldenFile)
 				if *update {
-					err := ioutil.WriteFile(golden, []byte(message), 0644)
+					err := os.WriteFile(golden, []byte(message), 0644) //nolint:gosec
 					if err != nil {
 						t.Fatal(err)
 					}
 				}
 
-				bytes, err := ioutil.ReadFile(golden)
+				bytes, err := os.ReadFile(golden)
 				if err != nil {
 					t.Fatal(err)
 				}

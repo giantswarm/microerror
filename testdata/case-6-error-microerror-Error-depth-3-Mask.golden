@@ -5,15 +5,15 @@
 	"stack": [
 		{
 			"file": "--REPLACED--/json_test.go",
+			"line": 78
+		},
+		{
+			"file": "--REPLACED--/json_test.go",
 			"line": 79
 		},
 		{
 			"file": "--REPLACED--/json_test.go",
-			"line": 80
-		},
-		{
-			"file": "--REPLACED--/json_test.go",
-			"line": 82
+			"line": 81
 		}
 	]
 }
