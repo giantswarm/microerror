@@ -6,15 +6,15 @@
 	"stack": [
 		{
 			"file": "--REPLACED--/json_test.go",
+			"line": 55
+		},
+		{
+			"file": "--REPLACED--/json_test.go",
 			"line": 56
 		},
 		{
 			"file": "--REPLACED--/json_test.go",
 			"line": 57
-		},
-		{
-			"file": "--REPLACED--/json_test.go",
-			"line": 58
 		}
 	]
 }
