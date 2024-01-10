@@ -9,8 +9,8 @@ import (
 // JSON prints the error with enriched information in JSON format. Enriched
 // information includes:
 //
-//	- All fields from Error type.
-//	- Error stack.
+//   - All fields from Error type.
+//   - Error stack.
 //
 // The rendered JSON can be unmarshalled with JSONError type.
 func JSON(err error) string {
