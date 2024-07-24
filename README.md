@@ -3,5 +3,7 @@
 
 # microerror
 
+**:warning: Important: This library has been deprecated in favor of [errors](https://pkg.go.dev/errors). Please, use errors instead of this library.**
+
 Go library to facilitate error handling.
 
