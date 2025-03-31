@@ -161,7 +161,7 @@ func Test_JSON(t *testing.T) {
 // to dash ('-'). Coalesces multiple dashes into one.
 func normalizeToFileName(s string) string {
 	var result []rune
-	for _, r := range []rune(s) { // nolint:staticcheck
+	for _, r := range []rune(s) { // nolint:staticcheck,gosimple
 		if unicode.IsDigit(r) || unicode.IsLetter(r) {
 			result = append(result, r)
 		} else {
