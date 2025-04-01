@@ -217,7 +217,7 @@ func TestPretty(t *testing.T) {
 					}
 				}
 
-				bytes, err := os.ReadFile(golden)
+				bytes, err := os.ReadFile(golden) // nolint:gosec
 				if err != nil {
 					t.Fatal(err)
 				}
