@@ -134,6 +134,8 @@ var testMicroErr = &Error{
 	Kind: "testKind",
 }
 
+const expectedErrorMsg = "test kind"
+
 func Test_Mask_Error(t *testing.T) {
 	testCases := []struct {
 		name           string
@@ -166,7 +168,7 @@ func Test_Mask_Error(t *testing.T) {
 				err = Mask(err)
 				return err
 			},
-			expectedError: "test kind",
+			expectedError: expectedErrorMsg,
 		},
 		{
 			name: "case 3: Mask depth=1 error=microerror.Error",
@@ -174,7 +176,7 @@ func Test_Mask_Error(t *testing.T) {
 				err := Mask(testMicroErr)
 				return err
 			},
-			expectedError: "test kind",
+			expectedError: expectedErrorMsg,
 		},
 		{
 			name: "case 4: Mask depth=3 error=microerror.Error",
@@ -184,7 +186,7 @@ func Test_Mask_Error(t *testing.T) {
 				err = Mask(err)
 				return err
 			},
-			expectedError: "test kind",
+			expectedError: expectedErrorMsg,
 		},
 		{
 			name: "case 5: Mask depth=1 error=errors.New",
