@@ -8,6 +8,8 @@ import (
 	"testing"
 )
 
+const errorKind = "somethingWentWrongError"
+
 // This test uses golden files.
 //
 // Run this command to update the snapshots:
@@ -59,7 +61,7 @@ func TestPretty(t *testing.T) {
 			name: "case 4: microerror, 0 depth",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return err
@@ -70,7 +72,7 @@ func TestPretty(t *testing.T) {
 			name: "case 5: microerror, 1 depth",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return Mask(err)
@@ -81,7 +83,7 @@ func TestPretty(t *testing.T) {
 			name: "case 6: microerror, 1 depth, with annotation",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return Maskf(err, "something bad happened, and we had to crash")
@@ -114,7 +116,7 @@ func TestPretty(t *testing.T) {
 			name: "case 9: microerror, 1 depth, with multiline annotation",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return Maskf(err, "something bad happened, and we had to crash\nthat's the first time it happened, really")
@@ -125,7 +127,7 @@ func TestPretty(t *testing.T) {
 			name: "case 10: microerror, 10 depth",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				// Let's build up this stack trace.
@@ -142,7 +144,7 @@ func TestPretty(t *testing.T) {
 			name: "case 11: microerror, 1 depth, with stack trace",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return Mask(err)
@@ -154,7 +156,7 @@ func TestPretty(t *testing.T) {
 			name: "case 12: microerror, 1 depth, with annotation, with stack trace",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return Maskf(err, "something bad happened, and we had to crash")
@@ -166,7 +168,7 @@ func TestPretty(t *testing.T) {
 			name: "case 13: microerror, 1 depth, with multiline annotation, with stack trace",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				return Maskf(err, "something bad happened, and we had to crash\nthat's the first time it happened, really")
@@ -178,7 +180,7 @@ func TestPretty(t *testing.T) {
 			name: "case 14: microerror, 10 depth, with stack trace",
 			errorFactory: func() error {
 				err := &Error{
-					Kind: "somethingWentWrongError",
+					Kind: errorKind,
 				}
 
 				// Let's build up this stack trace.
